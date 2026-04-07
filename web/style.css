@@ -1,0 +1,8 @@
+#grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3列 */
+    grid-template-rows: repeat(3, 1fr);    /* 3行 */
+    height: 90vh;
+    gap: 5px;
+}
+.grid-item { border: 1px solid #ccc; min-height: 200px; }

@@ -21,33 +21,35 @@ AnalysisManager::~AnalysisManager() {
 }
 
 bool AnalysisManager::Initialize() {
-    // 1. HistogramManagerの初期化
+  std::cout<<"AnalysisManager::Initialize()"<<std::endl;
+
+  // 1. HistogramManagerの初期化
     fHistoManager = new HistogramManager();
     if (!fHistoManager->Init("config/histogram_range.json")) {
         std::cerr << "[AnalysisManager] Warning: Failed to load histogram_range.json. Using defaults." << std::endl;
     }
-
+  std::cout<<__LINE__<<std::endl;
     // 2. config.json を読み込み、検出器を動的に生成
     if (!LoadConfig("config/config.json")) {
-        return false;
+      //return false;// skip
     }
-
+  std::cout<<__LINE__<<std::endl;
     // 3. ANAROOT EventStore の準備 (オンラインストリーム)
     fEventStore = new TArtEventStore();
     if (!fEventStore->Open()) { // デフォルトでオンライン(shm)等を開く設定
         std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
         return false;
     }
-
+  std::cout<<__LINE__<<std::endl;
     // 4. THttpServer の起動 (ポート 8080)
     fHttpServer = new THttpServer("http:8080");
     fHttpServer->AddLocation("monitoring/", "web/"); // UI資産の場所を指定
     fHttpServer->SetDefaultPage("monitoring/index.html");
-
+  std::cout<<__LINE__<<std::endl;
     // 5. ブラウザから叩ける「コマンド」の登録
     // 例: http://localhost:8080/Canvases/Reset/cmd.json でリセット実行
     fHttpServer->RegisterCommand("/ResetAll", "gHistoManager->ResetAll()", "button;icons:execute");
-
+  std::cout<<__LINE__<<std::endl;
     std::cout << "[AnalysisManager] Initialized. Server at http://localhost:8080" << std::endl;
     return true;
 }
@@ -75,7 +77,7 @@ bool AnalysisManager::LoadConfig(const std::string& configPath) {
 }
 
 bool AnalysisManager::ProcessEvent() {
-    if (!fEventStore->GetNextEvent()) return false;
+  //if (!fEventStore->GetNextEvent()) return false;
 
     // 各検出器にイベントデータを渡して解析・ヒストグラム充填
     for (auto analyzer : fAnalyzers) {

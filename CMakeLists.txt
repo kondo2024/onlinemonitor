@@ -1,30 +1,21 @@
 cmake_minimum_required(VERSION 3.15)
 project(smonlinemonitor LANGUAGES CXX)
 
-# ROOT を探す
-find_package(ROOT REQUIRED COMPONENTS RIO Hist Tree Gui)
+find_package(ROOT REQUIRED COMPONENTS Net Core RIO Hist Tree Gui RHTTP)
 include(${ROOT_USE_FILE})
 
-# C++17 を使用
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# コンパイルオプション（TThread セーフやデバッグ向け）
 add_compile_options(-Wall -Wextra -pthread)
 
-# ソースファイルをまとめる
 file(GLOB_RECURSE CORE_SOURCES "core/src/*.cc")
 file(GLOB_RECURSE DETECTOR_SOURCES "detectors/src/*.cc")
-# include ディレクトリ内のすべての .hh ファイルを取得（IDEでの表示用）
 file(GLOB_RECURSE HEADERS "core/include/*.hh" "detectors/include/*.hh")
 
 set(MAIN_SOURCE "smonlinemonitor.cc")
 
-# 実行形式を生成
-add_executable(smonlinemonitor ${SOURCES} ${HEADERS})
-
-# ROOT ライブラリをリンク
-target_link_libraries(smonlinemonitor ${ROOT_LIBRARIES})
+add_executable(smonlinemonitor ${MAIN_SOURCE} ${CORE_SOURCES} ${DETECTOR_SOURCES})
 
 ### ANAROOT ---------------------------
 if(DEFINED ENV{TARTSYS})
@@ -41,15 +32,15 @@ foreach(_cpt anaroot anacore anabrips anasamurai XMLParser)
   endif()
 endforeach()
 
-target_link_libraries(smonlinemonitor ${ANAROOT_LIBRARIES})
+target_link_libraries(smonlinemonitor PRIVATE ${ANAROOT_LIBRARIES} ${ROOT_LIBRARIES})
 #include_directories($ENV{TARTSYS}/include)
-target_include_directories(smonlinemonitor PRIVATE $ENV{TARTSYS}/include)
+### ANAROOT ---------------------------
 
-# include ディレクトリ
+
+target_include_directories(smonlinemonitor PRIVATE $ENV{TARTSYS}/include)
 target_include_directories(smonlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
 target_include_directories(smonlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/detectors/include)
 
-# コンパイル時の定義
 target_compile_definitions(smonlinemonitor PRIVATE "USE_THREADS")
 
 install(FILES ${INC_FILES} DESTINATION include)

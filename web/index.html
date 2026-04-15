@@ -16,14 +16,17 @@
       <div id="main-content">
 
 	<div class="controls">
-	  <button id="drawBtn">Update manually</button>
-	  <label><input type="checkbox" id="autoUpdate" checked> Auto Update</label>
-
-	  <div>
+	  <button id="runBtn" style="background-color: green; color: black; padding: 5px 15px; border: none; cursor: pointer;">Run</button>
+	  <button id="pauseBtn" style="background-color: red; color: black; padding: 5px 15px; border: none; cursor: pointer;">Pause</button>
+	  <span id="status-info" style="font-weight: bold; font-family: monospace;"></span>
+	  
+	  <div id="edit-controls" style="display: flex; gap: 10px; align-items: center;">
             Rows: <input type="number" id="inputRows" value="3" min="1" max="5" style="width: 40px;">
             Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
+            Page: <input type="number" id="inputPage" value="1" min="1" style="width: 50px;">
 	  </div>
-	  <span id="page-info" style="margin-left: 15px; font-family: monospace;"></span>
+    
+	  <span id="page-info" style="font-weight: bold; font-family: monospace;"></span>
 	</div>
 
         <div id="grid-container"></div>

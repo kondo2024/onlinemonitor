@@ -12,7 +12,7 @@ public:
 
   bool Init(HistogramManager* hm) override {
 
-    for (int i=0;i<101;++i){
+    for (int i=0;i<11;++i){
       hTest[i] = hm->GetTH1(Form("hTest%d",i),
 			    Form("Test Histogram %d;Value;Counts",i),
 			    100, 0, 100, "TestFolder");
@@ -24,7 +24,7 @@ public:
   }
 
   bool Process() override {
-    for (int i=0;i<101;++i)
+    for (int i=0;i<11;++i)
       hTest[i]->Fill(rand()%100 + i*10);
 
 //    hTest[0]->Print();

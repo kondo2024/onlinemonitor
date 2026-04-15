@@ -11,7 +11,7 @@ let settings = {
 let allHistogramPaths = []; 
 let activeHists = [];      
 let updateTimer = null;
-//let hp = null;
+let isRunning = true;
 
 async function init() {
     try {
@@ -28,9 +28,7 @@ async function init() {
 
 	activeHists = [...allHistogramPaths];
 
-	setupLayoutControls();
-	
-	// list for side bar
+	setupControls();
 	updateSidebar();
 	
 	const btn = document.getElementById('drawBtn');
@@ -56,20 +54,61 @@ async function init() {
     }
 }
 
-function setupLayoutControls() {
+function setupControls() {
+    const runBtn = document.getElementById('runBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
     const ir = document.getElementById('inputRows');
     const ic = document.getElementById('inputCols');
+    const ip = document.getElementById('inputPage');
+    const statusInfo = document.getElementById('status-info');
+    const editControls = [ir, ic, ip];
+
+    const toggleUI = (running) => {
+        isRunning = running;
+        runBtn.style.opacity = running ? "0.1" : "1";
+        pauseBtn.style.opacity = running ? "1" : "0.1";
+        
+        editControls.forEach(el => el.disabled = running);
+        
+        if (running) {
+	    runBtn.disabled = true;
+	    pauseBtn.disabled = false;
+	    startMonitoring();
+	    if (statusInfo) statusInfo.innerText = `Running`;
+
+        } else {
+	    runBtn.disabled = false;
+	    pauseBtn.disabled = true;
+	    if (statusInfo) statusInfo.innerText = `Paused`;
+            if (updateTimer) clearInterval(updateTimer);
+        }
+    };
+
+    runBtn.onclick = () => toggleUI(true);
+    pauseBtn.onclick = () => toggleUI(false);
 
     const updateLayout = () => {
         settings.rows = parseInt(ir.value) || 1;
         settings.columns = parseInt(ic.value) || 1;
         settings.histsPerPage = settings.rows * settings.columns;
         settings.currentPage = 0;
+        ip.value = 1;
         drawGrid();
     };
 
-    ir.addEventListener('change', updateLayout);
-    ic.addEventListener('change', updateLayout);
+    ir.onchange = updateLayout;
+    ic.onchange = updateLayout;
+
+    ip.onchange = () => {
+        const targetPage = (parseInt(ip.value) || 1) - 1;
+        const maxPageIdx = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
+        
+        settings.currentPage = Math.min(Math.max(0, targetPage), maxPageIdx);
+        ip.value = settings.currentPage + 1;
+        drawGrid();
+    };
+
+    toggleUI(true);
 }
 
 
@@ -80,11 +119,11 @@ function updateSidebar() {
     listContainer.innerHTML = '';
     allHistogramPaths.forEach((path, i) => {
         const li = document.createElement('li');
-        li.style.padding = "5px 10px";
+        li.style.padding = "0px 10px";
         li.style.display = "flex";
         li.style.alignItems = "center";
 
-        // チェックボックス
+	//check boxes
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.id = `cb_${i}`;
@@ -143,17 +182,17 @@ function findHistograms(node, path) {
 async function drawGrid() {
     const pageInfo = document.getElementById('page-info');
     const container = document.getElementById('grid-container');
+    const ip = document.getElementById('inputPage');
     if (!container) return;
 
     // page number
     const totalHists = activeHists.length;
     const maxPage = Math.max(1, Math.ceil(totalHists / settings.histsPerPage));
-    if (settings.currentPage >= maxPage && maxPage > 0) {
-        settings.currentPage = maxPage - 1;
-    }
     if (pageInfo) {
         pageInfo.innerText = `(Page ${settings.currentPage + 1}/${maxPage})`;
     }
+    if (ip&&!isRunning) ip.max = maxPage;
+    
     const start = settings.currentPage * settings.histsPerPage;
     const end = start + settings.histsPerPage;
     const pageItems = activeHists.slice(start, end);
@@ -162,14 +201,13 @@ async function drawGrid() {
     container.style.display = 'grid';
     container.style.width = '100%';
     container.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
-    container.style.gridTemplateRows = `repeat(${settings.rows}, 1fr)`; // 行数もJSで指定
-    container.style.height = "calc(100vh - 100px)"; // コントロールパネル分を引いた高さ
+    container.style.gridTemplateRows = `repeat(${settings.rows}, 1fr)`;
+    container.style.height = "calc(100vh - 100px)";
 
     const drawPromises = pageItems.map(async (path, i) => {
         const divId = `draw_div_${i}`;
         const wrapper = document.createElement('div');
         wrapper.className = 'grid-wrapper';
-	const dynamicHeight = Math.max(200, Math.floor(800 / settings.rows));
         wrapper.innerHTML = `
             <div id="${divId}"  class="grid-item"></div>
         `;
@@ -190,14 +228,12 @@ function startMonitoring() {
     if (updateTimer) clearInterval(updateTimer);
 
     updateTimer = setInterval(() => {
-        const autoUpdate = document.getElementById('autoUpdate')?.checked;
 
-        if (autoUpdate) {
-	    const totalHists = activeHists.length;
-            const maxPage = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
-            settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
-            drawGrid();
-	}
+	const totalHists = activeHists.length;
+        const maxPage = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
+        settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
+	document.getElementById('inputPage').value = settings.currentPage + 1;
+        drawGrid();
     }, settings.interval);
 }
 

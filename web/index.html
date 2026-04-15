@@ -1,33 +1,37 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
+<html lang="en">
+  <head>
     <meta charset="UTF-8">
     <title>SAMURAI Online Monitor</title>
-    <script src="jsroot/scripts/JSRoot.core.js" type="text/javascript"></script>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  </head>
+  <body>
     <div id="sidebar">
-        <h2>Control</h2>
-        <div class="control-group">
-            <label><input type="checkbox" id="autoUpdate" checked> Auto Update</label>
-            <label><input type="checkbox" id="autoPage"> Auto Page Flip</label>
-            <input type="number" id="interval" value="3" style="width:40px;"> sec
-        </div>
-        <hr>
-        <button onclick="resetHistograms()">Reset All Stats</button>
-        <hr>
-        <h3>Histograms</h3>
-        <div id="histList">
-            </div>
+      <h2>Control</h2>
+      <div class="control-group">
+        <label><input type="checkbox" id="autoUpdate" checked> Auto Update</label>
+        <label><input type="checkbox" id="autoPage"> Auto Page Flip</label>
+        <input type="number" id="interval" value="3" style="width:40px;"> sec
+
+        <button id="drawBtn">
+          Draw (Manual Refresh)
+        </button>
+      </div>
+      <hr>
+      <button id="resetBtn">Reset All Stats</button>
+      <hr>
+      <h3>Histograms</h3>
+      <div id="histList">
+      </div>
     </div>
 
     <div id="main-display">
-        <div id="grid-container">
-            </div>
-        <div id="page-info">Page: <span id="currentPage">1</span> / <span id="totalPages">1</span></div>
+      <div id="grid-container">
+      </div>
+      <div id="page-info">Page: <span id="currentPage">1</span> / <span id="totalPages">1</span></div>
     </div>
 
-    <script src="script.js" type="text/javascript"></script>
-</body>
+    <script src="script.js" type="module"></script>
+
+  </body>
 </html>

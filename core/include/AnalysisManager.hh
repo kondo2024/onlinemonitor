@@ -8,6 +8,7 @@
 class TArtEventStore;
 class THttpServer;
 class HistogramManager;
+class DisplayManager;
 class BaseAnalyzer;
 
 class AnalysisManager {
@@ -35,7 +36,8 @@ private:
     THttpServer* fHttpServer;
 
     // ヒストグラム管理
-    HistogramManager* fHistoManager;
+    HistogramManager* fHistManager;
+    DisplayManager* fDispManager;
 
     // 検出器アナライザーのリスト（多態性による一括管理）
     std::vector<BaseAnalyzer*> fAnalyzers;

@@ -2,7 +2,8 @@ import { openFile, redraw, httpRequest } from './jsroot/modules/main.mjs';
 
 let settings = {
     interval: parseInt(localStorage.getItem('sm_interval')) || 8000,
-    columns: parseInt(localStorage.getItem('sm_columns')) || 3,
+    rows: 3,
+    columns: 3,
     histsPerPage: 9,
     currentPage: 0
 };
@@ -26,6 +27,8 @@ async function init() {
         console.log("Found Paths:", allHistogramPaths);
 
 	activeHists = [...allHistogramPaths];
+
+	setupLayoutControls();
 	
 	// list for side bar
 	updateSidebar();
@@ -53,30 +56,22 @@ async function init() {
     }
 }
 
-//function updateSidebar() {
-//    const listContainer = document.getElementById('hist-list');
-//    if (!listContainer) return;
-//
-//    listContainer.innerHTML = '';
-//    allHistogramPaths.forEach((path, i) => {
-//        const li = document.createElement('li');
-//        li.style.padding = "5px 10px";
-//        li.style.borderBottom = "1px solid #eee";
-//        li.style.fontSize = "13px";
-//        li.style.cursor = "pointer";
-//        
-//        li.onclick = () => {
-//            const target = document.getElementById(`wrapper_div_${i}`);
-//            if (target) target.scrollIntoView({ behavior: 'smooth' });
-//        };
-//
-//        li.onmouseover = () => li.style.backgroundColor = "#f0f0f0";
-//        li.onmouseout = () => li.style.backgroundColor = "transparent";
-//        
-//        li.innerText = path;
-//        listContainer.appendChild(li);
-//    });
-//}
+function setupLayoutControls() {
+    const ir = document.getElementById('inputRows');
+    const ic = document.getElementById('inputCols');
+
+    const updateLayout = () => {
+        settings.rows = parseInt(ir.value) || 1;
+        settings.columns = parseInt(ic.value) || 1;
+        settings.histsPerPage = settings.rows * settings.columns;
+        settings.currentPage = 0;
+        drawGrid();
+    };
+
+    ir.addEventListener('change', updateLayout);
+    ic.addEventListener('change', updateLayout);
+}
+
 
 function updateSidebar() {
     const listContainer = document.getElementById('hist-list');
@@ -88,7 +83,6 @@ function updateSidebar() {
         li.style.padding = "5px 10px";
         li.style.display = "flex";
         li.style.alignItems = "center";
-        li.style.borderBottom = "1px solid #eee";
 
         // チェックボックス
         const cb = document.createElement('input');
@@ -105,7 +99,6 @@ function updateSidebar() {
             }
         };
 
-        // ラベル（クリックでスクロール）
         const label = document.createElement('label');
         label.innerText = path;
         label.style.cursor = "pointer";
@@ -146,56 +139,6 @@ function findHistograms(node, path) {
         }
     }
 }
-//async function drawGrid() {
-//    const container = document.getElementById('grid-container');
-//    if (!container) return;
-//
-//    container.innerHTML = '';
-//    container.style.display = 'grid';
-//    container.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
-//
-////    const drawPromises = allHistogramPaths.map(async (path, i) => {
-//    const drawPromises = activeHists.map(async (path, i) => {
-//        const divId = `draw_div_${i}`;
-//        const wrapper = document.createElement('div');
-//        wrapper.className = 'grid-wrapper';
-//        wrapper.innerHTML = `<div class="hist-label">${path}</div><div id="${divId}" class="grid-item" style="height:300px; border:1px solid #ccc;"></div>`;
-//        container.appendChild(wrapper);
-//
-//        try {
-//            const objUrl = `http://localhost:8080/${path}/root.json.gz`;
-//            const obj = await httpRequest(objUrl, "object");
-//            if (obj) {
-//                return redraw(divId, obj, "colz");
-//            }
-//        } catch (e) {
-//            console.error(`Failed to load ${path}:`, e);
-//        }
-//    });
-//
-//    await Promise.all(drawPromises);
-//    console.log("drawGrid() done");
-//    
-//}
-//
-//function startMonitoring() {
-//    if (updateTimer) clearInterval(updateTimer);
-//
-//    updateTimer = setInterval(() => {
-//        const autoUpdate = document.getElementById('autoUpdate')?.checked;
-//        const autoPage = document.getElementById('autoPage')?.checked;
-//
-//        if (autoUpdate) {
-//            drawGrid();
-//        }
-//
-//        if (autoPage) {
-//            const maxPage = Math.ceil(activeHists.length / settings.histsPerPage) - 1;
-//            settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
-//        }
-//    }, settings.interval);
-//}
-
 
 async function drawGrid() {
     const pageInfo = document.getElementById('page-info');
@@ -217,25 +160,19 @@ async function drawGrid() {
 
     container.innerHTML = '';
     container.style.display = 'grid';
+    container.style.width = '100%';
     container.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
+    container.style.gridTemplateRows = `repeat(${settings.rows}, 1fr)`; // 行数もJSで指定
+    container.style.height = "calc(100vh - 100px)"; // コントロールパネル分を引いた高さ
 
     const drawPromises = pageItems.map(async (path, i) => {
         const divId = `draw_div_${i}`;
         const wrapper = document.createElement('div');
         wrapper.className = 'grid-wrapper';
-	wrapper.style.marginBottom = "20px";
+	const dynamicHeight = Math.max(200, Math.floor(800 / settings.rows));
         wrapper.innerHTML = `
-            <div id="${divId}" style="height:280px; margin:0 2px;"></div>
+            <div id="${divId}"  class="grid-item"></div>
         `;
-//        wrapper.innerHTML = `
-//            <div style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:5px;">${path}</div>
-//            <div id="${divId}" style="height:280px; border:1px solid #ccc; margin:0 5px;"></div>
-//        `;
-
-//	wrapper.innerHTML = `
-//            <div style="text-align:center; font-size:11px;">[Page ${settings.currentPage+1}] ${path}</div>
-//            <div id="${divId}" style="height:250px; border:1px solid #ccc; margin:5px;"></div>
-//        `;
         container.appendChild(wrapper);
 
         try {
@@ -254,14 +191,11 @@ function startMonitoring() {
 
     updateTimer = setInterval(() => {
         const autoUpdate = document.getElementById('autoUpdate')?.checked;
-        const autoPage = document.getElementById('autoPage')?.checked;
 
-        if (autoPage) {
+        if (autoUpdate) {
 	    const totalHists = activeHists.length;
             const maxPage = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
             settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
-            drawGrid();
-        }else if (autoUpdate){
             drawGrid();
 	}
     }, settings.interval);

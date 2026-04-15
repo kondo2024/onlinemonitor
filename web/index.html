@@ -8,17 +8,26 @@
   <body>
 
     <div style="display: flex;">
-      <div id="sidebar" style="width: 250px; height: 100vh; overflow-y: auto; border-right: 1px solid #ccc; background: #f9f9f9;">
-        <h3 style="padding: 10px;">Histogram List</h3>
-        <ul id="hist-list" style="list-style: none; padding: 0; margin: 0;"></ul>
+      <div id="sidebar">
+        <h3 style="padding: 5px;">Histogram List</h3>
+        <ul id="hist-list" style="list-style: none;"></ul>
       </div>
 
-      <div id="main-content" style="flex: 1; height: 100vh; overflow-y: auto; padding: 20px;">
-        <button id="drawBtn">Update manually</button>
-	<label><input type="checkbox" id="autoUpdate" checked> auto update</label>
-	<label><input type="checkbox" id="autoPage" checked> auto paging</label>
-	<span id="page-info" style="margin-left: 15px; font-family: monospace;"></span>
+      <div id="main-content">
+
+	<div class="controls">
+	  <button id="drawBtn">Update manually</button>
+	  <label><input type="checkbox" id="autoUpdate" checked> Auto Update</label>
+
+	  <div>
+            Rows: <input type="number" id="inputRows" value="3" min="1" max="5" style="width: 40px;">
+            Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
+	  </div>
+	  <span id="page-info" style="margin-left: 15px; font-family: monospace;"></span>
+	</div>
+
         <div id="grid-container"></div>
+
       </div>
 
       <script src="script.js" type="module"></script>

@@ -1,8 +1,59 @@
+/* 全体のレイアウト */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+
+/* 左側のサイドバー */
+#sidebar {
+    width: 200px;
+    height: 100vh;
+    overflow-y: scroll;
+    border-right: 1px solid #ccc;
+}
+
+/* 右側のメインエリア */
+#main-content {
+    display: flex;
+    flex: 1;
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* コントロールパネル（Rows/Colsなどの入力エリア） */
+.controls {
+    padding: 10px;
+/*    border-bottom: 1px solid #ccc;*/
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* ヒストグラムを表示するグリッドコンテナ */
 #grid-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3列 */
-    grid-template-rows: repeat(3, 1fr);    /* 3行 */
-    height: 90vh;
-    gap: 5px;
+    width: 100%;
+    /* grid-template-columns は JS で上書きされるため、ここでは指定しなくてOK */
+    flex: 1; /* 残りの高さをすべて使う */
 }
-.grid-item { border: 1px solid #ccc; min-height: 200px; }
+
+/* グラフを包む枠 */
+.grid-wrapper {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* JSROOTが描画される実際の領域 */
+.grid-item {
+    flex: 1; /* ラベル以外の高さを埋める */
+    width: 100%;
+    min-height: 0;
+}
+

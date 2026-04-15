@@ -1,7 +1,7 @@
 import { openFile, redraw, httpRequest } from './jsroot/modules/main.mjs';
 
 let settings = {
-    interval: parseInt(localStorage.getItem('sm_interval')) || 3000,
+    interval: parseInt(localStorage.getItem('sm_interval')) || 8000,
     columns: parseInt(localStorage.getItem('sm_columns')) || 3,
     histsPerPage: 9,
     currentPage: 0
@@ -10,212 +10,244 @@ let settings = {
 let allHistogramPaths = []; 
 let activeHists = [];      
 let updateTimer = null;
-let hp = null; // サーバーオブジェクトをグローバルで保持
+//let hp = null;
 
 async function init() {
-//    try {
-//	console.log(" init() start ...");
-//        // 1. サーバーに接続 (末尾のスラッシュが重要)
-//        hp = await openFile("http://localhost:8080");
-//	console.log("hp:",hp);
-//        if (!hp) throw new Error("Could not connect to THttpServer");
-//
-////        const hierarchy = await httpRequest("http://localhost:8080/h.json","object");
-////	if (!hierarchy) {
-////            console.error("Could not fetch h.json. Check CORS settings or ROOT server.");
-////            return;
-////        }
-////
-////        console.log("Hierarchy success:", hierarchy);
-//
-//	let hierarchy = null;
-//        if (typeof hp.getHierarchy === 'function') {
-//	    console.log("Fetching hierarchy by hp.getHierarchy");
-//            hierarchy = await hp.getHierarchy();
-//        } else if (hp._childs) {
-//            // THttpServerの場合、hpオブジェクト自体がルートノードになっていることが多い
-//            hierarchy = hp;
-//        } else {
-//            // それでもダメなら、サーバーのツリー構造を直接取得しにいく
-//	    console.log("Fetching hierarchy from h.json ...");
-//            hierarchy = await httpRequest("http://localhost:8080/h.json", "object");
-//        }
-//
-//	if (!hierarchy){
-//	    throw new Error("Could not obtain hierarchy");
-//	}
-//
-//	console.log("Hierarchy obtained:",hierarchy);
-//	
-//        // 2. ヒストグラムを検索
-//        allHistogramPaths = []; // 初期化
-//        findHistograms(hierarchy);
-//        
-//        // とりあえず全ヒストグラムを表示対象にする（運用に合わせて変更してください）
-//        activeHists = [...allHistogramPaths];
-//
-//        // 3. イベント登録
-//        document.getElementById('drawBtn').addEventListener('click', manualDraw);
-//        // 他のUI要素（自動更新チェックボックスなど）があればここで登録
-//	const resetBtn = document.getElementById('resetBtn');
-//        if (resetBtn) {
-//            resetBtn.addEventListener('click', resetHistograms);
-//	}	
-//        // 初回描画
-//        await drawGrid();
-//        
-//        // 監視スタート
-//        startMonitoring();
-//
-//    } catch (err) {
-//        console.error("JSROOT Connection Error:", err);
-//    }
-
     try {
         console.log("Direct access to h.json...");
-
-        //hp = await openFile("http://localhost:8080/Objects/root.json");
-	
-        // 1. サーバーの階層情報を直接取得
 	const hierarchy = await httpRequest("http://localhost:8080/h.json", "object");
         
         if (!hierarchy) {
-            throw new Error("h.json にアクセスできません。CORSかネットワークを確認してください。");
+            throw new Error("cannot access to h.json");
         }
 
-        // 2. パスを解析
         allHistogramPaths = [];
         findHistograms(hierarchy);
         console.log("Found Paths:", allHistogramPaths);
 
+	activeHists = [...allHistogramPaths];
+	
+	// list for side bar
+	updateSidebar();
+	
 	const btn = document.getElementById('drawBtn');
         if (btn) {
             btn.onclick = async () => {
                 console.log("Manual draw triggered.");
-                btn.disabled = true; // 連打防止
-                btn.innerText = "描画中...";
+                btn.disabled = true;
+                btn.innerText = "Drawing...";
                 
-                await drawGrid(); // マニュアルで再描画実行
+                await drawGrid();
                 
                 btn.disabled = false;
-                btn.innerText = "🔄 マニュアル描画（最新取得）";
+                btn.innerText = "Update manually";
             };
         }
 	
-        // 3. 描画実行
         await drawGrid();
 
+	startMonitoring();// start timer
+	
     } catch (err) {
         console.error("Custom Init Error:", err);
     }
-
 }
+
+//function updateSidebar() {
+//    const listContainer = document.getElementById('hist-list');
+//    if (!listContainer) return;
+//
+//    listContainer.innerHTML = '';
+//    allHistogramPaths.forEach((path, i) => {
+//        const li = document.createElement('li');
+//        li.style.padding = "5px 10px";
+//        li.style.borderBottom = "1px solid #eee";
+//        li.style.fontSize = "13px";
+//        li.style.cursor = "pointer";
+//        
+//        li.onclick = () => {
+//            const target = document.getElementById(`wrapper_div_${i}`);
+//            if (target) target.scrollIntoView({ behavior: 'smooth' });
+//        };
+//
+//        li.onmouseover = () => li.style.backgroundColor = "#f0f0f0";
+//        li.onmouseout = () => li.style.backgroundColor = "transparent";
+//        
+//        li.innerText = path;
+//        listContainer.appendChild(li);
+//    });
+//}
+
+function updateSidebar() {
+    const listContainer = document.getElementById('hist-list');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = '';
+    allHistogramPaths.forEach((path, i) => {
+        const li = document.createElement('li');
+        li.style.padding = "5px 10px";
+        li.style.display = "flex";
+        li.style.alignItems = "center";
+        li.style.borderBottom = "1px solid #eee";
+
+        // チェックボックス
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.id = `cb_${i}`;
+        cb.checked = activeHists.includes(path);
+        cb.style.marginRight = "10px";
+        
+        cb.onchange = () => {
+            if (cb.checked) {
+                if (!activeHists.includes(path)) activeHists.push(path);
+            } else {
+                activeHists = activeHists.filter(p => p !== path);
+            }
+        };
+
+        // ラベル（クリックでスクロール）
+        const label = document.createElement('label');
+        label.innerText = path;
+        label.style.cursor = "pointer";
+        label.style.fontSize = "13px";
+        label.style.flexGrow = "1";
+        label.onclick = () => {
+            const target = document.getElementById(`wrapper_div_${path}`);
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        li.appendChild(cb);
+        li.appendChild(label);
+        listContainer.appendChild(li);
+    });
+}
+
 function findHistograms(node, path) {
     if (!node) return;
 
-    // 初回呼び出し（pathが未定義）の場合は空文字をセット
     if (path === undefined) path = "";
 
     const name = node._name || "";
     const kind = node._kind || "";
 
-    // パスを組み立てる（"ROOT" はスキップ）
     let nextPath = path;
     if (name && name !== "ROOT") {
         nextPath = path ? (path + "/" + name) : name;
     }
 
-    // ヒストグラム判定
     if (kind.indexOf("TH") !== -1 || kind.indexOf("TProfile") !== -1) {
-        console.log("✅ Found Hist Path:", nextPath);
+        console.log("Found Hist Path:", nextPath);
         allHistogramPaths.push(nextPath);
     }
 
-    // 子要素を探索
     if (node._childs && Array.isArray(node._childs)) {
         for (let i = 0; i < node._childs.length; i++) {
-            // 親のパス (nextPath) を子に渡す
             findHistograms(node._childs[i], nextPath);
         }
     }
 }
-//// 描画関数を async に修正
 //async function drawGrid() {
 //    const container = document.getElementById('grid-container');
 //    if (!container) return;
 //
-//    container.innerHTML = ''; 
+//    container.innerHTML = '';
+//    container.style.display = 'grid';
 //    container.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
 //
-//    const start = settings.currentPage * settings.histsPerPage;
-//    //const pageHists = activeHists.slice(start, start + settings.histsPerPage);
-//    const pageHists = allHistogramPaths.slice(start, start + settings.histsPerPage);
-//
-//    // Promise.all を使うため、map の中で async/await を使用
-//    const drawPromises = pageHists.map(async (path, i) => {
+////    const drawPromises = allHistogramPaths.map(async (path, i) => {
+//    const drawPromises = activeHists.map(async (path, i) => {
 //        const divId = `draw_div_${i}`;
 //        const wrapper = document.createElement('div');
 //        wrapper.className = 'grid-wrapper';
-//        wrapper.innerHTML = `<div class="hist-label">${path}</div><div id="${divId}" class="grid-item" style="height:300px;"></div>`;
+//        wrapper.innerHTML = `<div class="hist-label">${path}</div><div id="${divId}" class="grid-item" style="height:300px; border:1px solid #ccc;"></div>`;
 //        container.appendChild(wrapper);
 //
 //        try {
-//            // サーバーオブジェクト(hp)からオブジェクトを取得
-//            const obj = await hp.readObject(path);
-//            return redraw(divId, obj, "colz");
+//            const objUrl = `http://localhost:8080/${path}/root.json.gz`;
+//            const obj = await httpRequest(objUrl, "object");
+//            if (obj) {
+//                return redraw(divId, obj, "colz");
+//            }
 //        } catch (e) {
-//            console.error(`Failed to draw ${path}:`, e);
+//            console.error(`Failed to load ${path}:`, e);
 //        }
 //    });
 //
 //    await Promise.all(drawPromises);
+//    console.log("drawGrid() done");
+//    
+//}
+//
+//function startMonitoring() {
+//    if (updateTimer) clearInterval(updateTimer);
+//
+//    updateTimer = setInterval(() => {
+//        const autoUpdate = document.getElementById('autoUpdate')?.checked;
+//        const autoPage = document.getElementById('autoPage')?.checked;
+//
+//        if (autoUpdate) {
+//            drawGrid();
+//        }
+//
+//        if (autoPage) {
+//            const maxPage = Math.ceil(activeHists.length / settings.histsPerPage) - 1;
+//            settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
+//        }
+//    }, settings.interval);
 //}
 
+
 async function drawGrid() {
+    const pageInfo = document.getElementById('page-info');
     const container = document.getElementById('grid-container');
     if (!container) return;
 
+    // page number
+    const totalHists = activeHists.length;
+    const maxPage = Math.max(1, Math.ceil(totalHists / settings.histsPerPage));
+    if (settings.currentPage >= maxPage && maxPage > 0) {
+        settings.currentPage = maxPage - 1;
+    }
+    if (pageInfo) {
+        pageInfo.innerText = `(Page ${settings.currentPage + 1}/${maxPage})`;
+    }
+    const start = settings.currentPage * settings.histsPerPage;
+    const end = start + settings.histsPerPage;
+    const pageItems = activeHists.slice(start, end);
+
     container.innerHTML = '';
+    container.style.display = 'grid';
     container.style.gridTemplateColumns = `repeat(${settings.columns}, 1fr)`;
 
-    const drawPromises = allHistogramPaths.map(async (path, i) => {
+    const drawPromises = pageItems.map(async (path, i) => {
         const divId = `draw_div_${i}`;
         const wrapper = document.createElement('div');
         wrapper.className = 'grid-wrapper';
-        wrapper.innerHTML = `<div class="hist-label">${path}</div><div id="${divId}" class="grid-item" style="height:300px; border:1px solid #ccc;"></div>`;
+	wrapper.style.marginBottom = "20px";
+        wrapper.innerHTML = `
+            <div id="${divId}" style="height:280px; margin:0 2px;"></div>
+        `;
+//        wrapper.innerHTML = `
+//            <div style="text-align:center; font-size:12px; font-weight:bold; margin-bottom:5px;">${path}</div>
+//            <div id="${divId}" style="height:280px; border:1px solid #ccc; margin:0 5px;"></div>
+//        `;
+
+//	wrapper.innerHTML = `
+//            <div style="text-align:center; font-size:11px;">[Page ${settings.currentPage+1}] ${path}</div>
+//            <div id="${divId}" style="height:250px; border:1px solid #ccc; margin:5px;"></div>
+//        `;
         container.appendChild(wrapper);
 
         try {
-            // 重要：readObjectを使わず、直接 json.gz を取得して描画する
-            const objUrl = `http://localhost:8080/${path}/root.json.gz`;
-            const obj = await httpRequest(objUrl, "object");
-            if (obj) {
-                return redraw(divId, obj, "colz");
-            }
+            const obj = await httpRequest(`http://localhost:8080/${path}/root.json.gz`, "object");
+            if (obj) await redraw(divId, obj, "colz");
         } catch (e) {
-            console.error(`Failed to load ${path}:`, e);
+            console.error(e);
         }
     });
 
     await Promise.all(drawPromises);
-    console.log("drawGrid() done");
-    
 }
-
-
-//function manualDraw() {
-//    const btn = document.getElementById('drawBtn');
-//    btn.disabled = true;
-//    btn.innerText = "Drawing...";
-//
-//    drawGrid().then(() => {
-//        setTimeout(() => {
-//            btn.disabled = false;
-//            btn.innerText = "Draw (Manual Refresh)";
-//        }, 500);
-//    });
-//    console.log("manualDraw() done");
-//}
 
 function startMonitoring() {
     if (updateTimer) clearInterval(updateTimer);
@@ -224,25 +256,22 @@ function startMonitoring() {
         const autoUpdate = document.getElementById('autoUpdate')?.checked;
         const autoPage = document.getElementById('autoPage')?.checked;
 
-        if (autoUpdate) {
-            drawGrid();
-        }
-
         if (autoPage) {
-            const maxPage = Math.ceil(activeHists.length / settings.histsPerPage) - 1;
+	    const totalHists = activeHists.length;
+            const maxPage = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
             settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
-        }
+            drawGrid();
+        }else if (autoUpdate){
+            drawGrid();
+	}
     }, settings.interval);
 }
 
-// サーバーコマンド送信
 async function resetHistograms() {
-    if (confirm("本当にリセットしますか？")) {
-        // http://localhost:8080/ResetAll/cmd.json にリクエストを送る例
+    if (confirm("really want to reset?")) {
         await httpRequest("ResetAll/cmd.json", "text");
     }
 }
 
-// 実行
 init();
 

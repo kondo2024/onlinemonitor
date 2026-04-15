@@ -76,7 +76,7 @@ bool AnalysisManager::LoadConfig(const std::string& configPath) {
     analyzer->Init(fHistManager);
   }
 
-  gROOT->GetList()->ls();
+  //gROOT->GetList()->ls();
   return true;
 }
 

@@ -6,32 +6,22 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div id="sidebar">
-      <h2>Control</h2>
-      <div class="control-group">
-        <label><input type="checkbox" id="autoUpdate" checked> Auto Update</label>
-        <label><input type="checkbox" id="autoPage"> Auto Page Flip</label>
-        <input type="number" id="interval" value="3" style="width:40px;"> sec
 
-        <button id="drawBtn">
-          Draw (Manual Refresh)
-        </button>
+    <div style="display: flex;">
+      <div id="sidebar" style="width: 250px; height: 100vh; overflow-y: auto; border-right: 1px solid #ccc; background: #f9f9f9;">
+        <h3 style="padding: 10px;">Histogram List</h3>
+        <ul id="hist-list" style="list-style: none; padding: 0; margin: 0;"></ul>
       </div>
-      <hr>
-      <button id="resetBtn">Reset All Stats</button>
-      <hr>
-      <h3>Histograms</h3>
-      <div id="histList">
-      </div>
-    </div>
 
-    <div id="main-display">
-      <div id="grid-container">
+      <div id="main-content" style="flex: 1; height: 100vh; overflow-y: auto; padding: 20px;">
+        <button id="drawBtn">Update manually</button>
+	<label><input type="checkbox" id="autoUpdate" checked> auto update</label>
+	<label><input type="checkbox" id="autoPage" checked> auto paging</label>
+	<span id="page-info" style="margin-left: 15px; font-family: monospace;"></span>
+        <div id="grid-container"></div>
       </div>
-      <div id="page-info">Page: <span id="currentPage">1</span> / <span id="totalPages">1</span></div>
-    </div>
 
-    <script src="script.js" type="module"></script>
+      <script src="script.js" type="module"></script>
 
   </body>
 </html>

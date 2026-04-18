@@ -12,6 +12,7 @@ let allHistogramPaths = [];
 let activeHists = [];      
 let updateTimer = null;
 let isRunning = false;
+let lastSuccessTime = Date.now();
 
 async function init() {
     try {
@@ -30,20 +31,6 @@ async function init() {
 
 	setupControls();
 	updateSidebar();
-	
-	const btn = document.getElementById('drawBtn');
-        if (btn) {
-            btn.onclick = async () => {
-                console.log("Manual draw triggered.");
-                btn.disabled = true;
-                btn.innerText = "Drawing...";
-                
-                await drawGrid();
-                
-                btn.disabled = false;
-                btn.innerText = "Update manually";
-            };
-        }
 	
         await drawGrid();
 
@@ -120,7 +107,7 @@ function setupControls() {
                     resetBtn.disabled = true;
                     resetBtn.innerText = "Resetting...";
                     await httpRequest("/ResetAll/cmd.json", "text");
-                    console.log("Statistics reset successful.");
+                    console.log("Histogram reset successful.");
                     await drawGrid();
 
                 } catch (err) {
@@ -182,13 +169,31 @@ function updateSidebar() {
 }
 
 async function updateTimeDisplay() {
+    const warningElement = document.getElementById('process-warning');
+    const timeDisplay = document.getElementById('server-date-time');
+    const statusInfo = document.getElementById('status-info');
+    
     try {
         const res = await httpRequest("/Status/ServerTime/root.json", "object");
+        
         if (res && res.fTitle) {
-            document.getElementById('server-date-time').textContent = res.fTitle;
+            timeDisplay.textContent = res.fTitle;
+            lastSuccessTime = Date.now();
+            warningElement.style.display = "none";
         }
     } catch (err) {
         console.error("Error at getting server date/time:", err);
+        
+        if (isRunning) {
+            const idleSeconds = (Date.now() - lastSuccessTime) / 1000;
+            console.error(idleSeconds);
+            
+            if (idleSeconds > 5) {
+                warningElement.style.display = "block";
+                timeDisplay.textContent = "Disconnected";
+		isRunning = false;
+            }
+        }
     }
 }
 
@@ -206,7 +211,7 @@ function findHistograms(node, path) {
     }
 
     if (kind.indexOf("TH") !== -1 || kind.indexOf("TProfile") !== -1) {
-        console.log("Found Hist Path:", nextPath);
+        //console.log("Found Hist Path:", nextPath);
         allHistogramPaths.push(nextPath);
     }
 
@@ -218,6 +223,8 @@ function findHistograms(node, path) {
 }
 
 async function drawGrid() {
+    await updateTimeDisplay();
+
     const pageInfo = document.getElementById('page-info');
     const container = document.getElementById('grid-container');
     const ip = document.getElementById('inputPage');
@@ -259,7 +266,6 @@ async function drawGrid() {
         }
     });
 
-    await updateTimeDisplay();
     await Promise.all(drawPromises);
 }
 

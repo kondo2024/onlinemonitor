@@ -1,0 +1,8 @@
+{
+    "analyzers": ["Test"],
+    "hist_range_file": "config/hist_ranges.json",
+    "display": {
+	"default_hists_per_page": 9,
+	"default_columns": 3
+    }
+}

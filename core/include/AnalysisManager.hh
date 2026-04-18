@@ -3,47 +3,44 @@
 
 #include <vector>
 #include <string>
+#include <TDatime.h>
 
-// 前方宣言（コンパイル時間の短縮と循環参照の防止）
 class TArtEventStore;
 class THttpServer;
 class HistogramManager;
 class DisplayManager;
 class BaseAnalyzer;
+class TNamed;
 
 class AnalysisManager {
 public:
-    AnalysisManager();
-    virtual ~AnalysisManager();
+  AnalysisManager();
+  virtual ~AnalysisManager();
 
-    // 初期化：EventStoreのオープン、Serverの起動、Detectorsの生成
-    bool Initialize();
+  bool Initialize();
 
-    // 1イベントごとの処理：EventStoreからデータを読み、各Analyzerに渡す
-    bool ProcessEvent();
+  void SetupHttpCommands(THttpServer* serv);
+  
+  bool ProcessEvent();
 
-    // 終了処理：メモリ解放、Serverの停止
-    void Finalize();
+  void Finalize();
 
 private:
-    // config.json を読み込み、必要な検出器クラスをインスタンス化する
-    bool LoadConfig(const std::string& configPath);
+  bool LoadConfig(const std::string& configPath);
 
-    // ANAROOT 関連
-    TArtEventStore* fEventStore;
+  TArtEventStore* fEventStore;
 
-    // ROOT HTTP Server 関連
-    THttpServer* fHttpServer;
+  THttpServer* fHttpServer;
 
-    // ヒストグラム管理
-    HistogramManager* fHistManager;
-    DisplayManager* fDispManager;
+  HistogramManager* fHistManager;
+  DisplayManager* fDispManager;
 
-    // 検出器アナライザーのリスト（多態性による一括管理）
-    std::vector<BaseAnalyzer*> fAnalyzers;
+  TNamed* fServerTime;
+  TDatime fDatime;
 
-    // 内部フラグ
-    bool fIsInitialized;
+  std::vector<BaseAnalyzer*> fAnalyzers;
+
+  bool fIsInitialized;
 };
 
 #endif

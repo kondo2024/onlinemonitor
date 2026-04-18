@@ -11,18 +11,13 @@ public:
   HistogramManager();
   virtual ~HistogramManager();
 
-  // 初期化：JSON読み込みとディレクトリ作成
   bool Init(const std::string& configPath);
 
-  // ヒストグラムの取得または生成
-  // デフォルト値(bins, min, max)を指定し、JSONがあれば上書きする
   TH1* GetTH1(const std::string& name, const std::string& title, 
 	      int bins, double min, double max, const std::string& folder = "Detectors");
 
-  // 全ヒストグラムのリセット（THttpServerから呼ばれる用）
   void ResetAll();
 
-  // 特定のヒストグラムの再設定（JSON更新時など）
   void UpdateFromJSON(const std::string& configPath);
 
   void PrintListOfHistograms();
@@ -35,7 +30,6 @@ private:
   void LoadJSON(const std::string& path);
 };
 
-// THttpServerのコマンドからアクセスしやすくするため、グローバルポインタを用意
-extern HistogramManager* gHistoManager;
+extern HistogramManager* gHistManager;
 
 #endif

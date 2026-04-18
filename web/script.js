@@ -11,7 +11,7 @@ let settings = {
 let allHistogramPaths = []; 
 let activeHists = [];      
 let updateTimer = null;
-let isRunning = true;
+let isRunning = false;
 
 async function init() {
     try {
@@ -57,35 +57,38 @@ async function init() {
 function setupControls() {
     const runBtn = document.getElementById('runBtn');
     const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const ir = document.getElementById('inputRows');
     const ic = document.getElementById('inputCols');
     const ip = document.getElementById('inputPage');
     const statusInfo = document.getElementById('status-info');
-    const editControls = [ir, ic, ip];
+    const editControls = [ir, ic, ip, resetBtn];
 
-    const toggleUI = (running) => {
-        isRunning = running;
-        runBtn.style.opacity = running ? "0.1" : "1";
-        pauseBtn.style.opacity = running ? "1" : "0.1";
+    const toggleUI = () => {
+        isRunning = !isRunning;
+
+        editControls.forEach(el =>{
+	    el.disabled = isRunning;
+	    if (isRunning){
+		el.style.cursor = "not-allowed";
+	    }else{
+		el.style.cursor = "auto";
+	    }
+	});
         
-        editControls.forEach(el => el.disabled = running);
-        
-        if (running) {
-	    runBtn.disabled = true;
-	    pauseBtn.disabled = false;
+        if (isRunning) {
+	    runBtn.textContent = 'Pause';
 	    startMonitoring();
-	    if (statusInfo) statusInfo.innerText = `Running`;
+	    if (statusInfo) statusInfo.innerText = `Auto Update ON`;
 
         } else {
-	    runBtn.disabled = false;
-	    pauseBtn.disabled = true;
+	    runBtn.textContent = 'Auto Update ON';
 	    if (statusInfo) statusInfo.innerText = `Paused`;
             if (updateTimer) clearInterval(updateTimer);
         }
     };
 
-    runBtn.onclick = () => toggleUI(true);
-    pauseBtn.onclick = () => toggleUI(false);
+    runBtn.onclick = () => toggleUI();
 
     const updateLayout = () => {
         settings.rows = parseInt(ir.value) || 1;
@@ -108,7 +111,31 @@ function setupControls() {
         drawGrid();
     };
 
-    toggleUI(true);
+    
+    if (resetBtn) {
+        resetBtn.onclick = async () => {
+            const confirmed = confirm("Reset all histogram statistics?");
+            if (confirmed) {
+                try {
+                    resetBtn.disabled = true;
+                    resetBtn.innerText = "Resetting...";
+                    await httpRequest("/ResetAll/cmd.json", "text");
+                    console.log("Statistics reset successful.");
+                    await drawGrid();
+
+                } catch (err) {
+                    console.error("Reset Error:", err);
+                    alert("failed to reset histograms");
+                } finally {
+                    resetBtn.disabled = false;
+                    resetBtn.innerText = "Reset events";
+                }
+            }
+        };
+    }
+
+    
+    toggleUI();
 }
 
 
@@ -121,7 +148,7 @@ function updateSidebar() {
         const li = document.createElement('li');
         li.style.padding = "0px 10px";
         li.style.display = "flex";
-        li.style.alignItems = "center";
+        li.style.alignItems = "left";
 
 	//check boxes
         const cb = document.createElement('input');
@@ -131,12 +158,12 @@ function updateSidebar() {
         cb.style.marginRight = "10px";
         
         cb.onchange = () => {
-            if (cb.checked) {
-                if (!activeHists.includes(path)) activeHists.push(path);
-            } else {
-                activeHists = activeHists.filter(p => p !== path);
-            }
-        };
+	    const checkedPaths = allHistogramPaths.filter((p, index) => {
+                const checkbox = document.getElementById(`cb_${index}`);
+                return checkbox ? checkbox.checked : activeHists.includes(p);
+            });
+	    activeHists = checkedPaths;
+	};
 
         const label = document.createElement('label');
         label.innerText = path;
@@ -152,6 +179,17 @@ function updateSidebar() {
         li.appendChild(label);
         listContainer.appendChild(li);
     });
+}
+
+async function updateTimeDisplay() {
+    try {
+        const res = await httpRequest("/Status/ServerTime/root.json", "object");
+        if (res && res.fTitle) {
+            document.getElementById('server-date-time').textContent = res.fTitle;
+        }
+    } catch (err) {
+        console.error("Error at getting server date/time:", err);
+    }
 }
 
 function findHistograms(node, path) {
@@ -221,6 +259,7 @@ async function drawGrid() {
         }
     });
 
+    await updateTimeDisplay();
     await Promise.all(drawPromises);
 }
 
@@ -233,6 +272,7 @@ function startMonitoring() {
         const maxPage = Math.max(0, Math.ceil(activeHists.length / settings.histsPerPage) - 1);
         settings.currentPage = (settings.currentPage >= maxPage) ? 0 : settings.currentPage + 1;
 	document.getElementById('inputPage').value = settings.currentPage + 1;
+	updateTimeDisplay();
         drawGrid();
     }, settings.interval);
 }

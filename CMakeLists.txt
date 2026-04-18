@@ -43,5 +43,5 @@ target_include_directories(smonlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/d
 
 target_compile_definitions(smonlinemonitor PRIVATE "USE_THREADS")
 
-install(FILES ${INC_FILES} DESTINATION include)
+install(FILES ${HEADERS} DESTINATION include)
 install(TARGETS smonlinemonitor DESTINATION ${CMAKE_INSTALL_BINDIR})

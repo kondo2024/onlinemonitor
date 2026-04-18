@@ -1,18 +1,30 @@
 #include "AnalysisManager.hh"
 #include "HistogramManager.hh"
 #include "DisplayManager.hh"
-#include "TestAnalyzer.hh" // 具象クラスのインクルード
-// #include "BDCAnalyzer.hh" // 必要に応じて追加
+#include "TestAnalyzer.hh"
+// #include "BDCAnalyzer.hh"
 
 #include <TArtEventStore.hh>
 #include <THttpServer.h>
+#include <TNamed.h>
+#include <TDatime.h>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <iostream>
 #include <fstream>
-#include <nlohmann/json.hpp> // JSONライブラリ (要設定)
+#include <nlohmann/json.hpp>
+#include <TInterpreter.h>
 
 using json = nlohmann::json;
+
+
+extern "C" void Internal_EventReset() {
+    if (gHistManager) {
+        gHistManager->ResetAll();
+    } else {
+        std::cerr << "Error: gHistManager is null!" << std::endl;
+    }
+}
 
 AnalysisManager::AnalysisManager() 
   : fEventStore(nullptr), fHttpServer(nullptr), fHistManager(nullptr),
@@ -27,6 +39,7 @@ AnalysisManager::~AnalysisManager() {
 bool AnalysisManager::Initialize() {
 
   fHistManager = new HistogramManager();
+  gHistManager = fHistManager;
   if (!fHistManager->Init("config/histogram_range.json")) {
     std::cerr << "[AnalysisManager] Warning: Failed to load histogram_range.json. Using defaults." << std::endl;
   }
@@ -39,7 +52,7 @@ bool AnalysisManager::Initialize() {
   fDispManager->Init("config/config.json");
 
   fEventStore = new TArtEventStore();
-  if (!fEventStore->Open()) { // デフォルトでオンライン(shm)等を開く設定
+  if (!fEventStore->Open()) {
     std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
     return false;
   }
@@ -47,14 +60,33 @@ bool AnalysisManager::Initialize() {
   fHttpServer = new THttpServer("http:8080?cors");
   fHttpServer->AddLocation("onlinemonitor/", "web/"); //root dir of URL is web
   fHttpServer->SetDefaultPage("index.html");
+  fHttpServer->SetReadOnly(kFALSE);
 
-  // 例: http://localhost:8080/Canvases/Reset/cmd.json でリセット実行
   fHttpServer->RegisterCommand("/Layout", "gDispManager->GetLayoutJSON()");
   fHttpServer->RegisterCommand("/ShowHistList", "gHistManager->GetListOfHistograms()");
-  fHttpServer->RegisterCommand("/ResetAll", "gHistManager->ResetAll()", "button;icons:execute");
+  SetupHttpCommands(fHttpServer);
+
+  fServerTime = new TNamed("ServerTime","Starting ...");
+  fHttpServer->Register("/Status",fServerTime);
+  
   std::cout << "[AnalysisManager] Initialized. Server at http://localhost:8080" << std::endl;
   return true;
 }
+
+void AnalysisManager::SetupHttpCommands(THttpServer* serv) {
+    if (!serv) return;
+    long long funcAddr = (long long)(void*)Internal_EventReset;
+    TString code;
+    code.Form(
+        "extern \"C\" void GlobalReset() { "
+        "  auto f = (void (*)()) %lld; "
+        "  if (f) f(); "
+        "}", funcAddr);
+    
+    gInterpreter->Declare(code.Data());
+    serv->RegisterCommand("/ResetAll", "GlobalReset()");
+}
+
 
 bool AnalysisManager::LoadConfig(const std::string& configPath) {
   std::ifstream ifs(configPath);
@@ -71,24 +103,22 @@ bool AnalysisManager::LoadConfig(const std::string& configPath) {
     // else if (detName == "BDC") fAnalyzers.push_back(new BDCAnalyzer());
   }
 
-  // 各検出器の初期化
   for (auto analyzer : fAnalyzers) {
     analyzer->Init(fHistManager);
   }
 
-  //gROOT->GetList()->ls();
   return true;
 }
 
 bool AnalysisManager::ProcessEvent() {
   //if (!fEventStore->GetNextEvent()) return false;
 
-  // 各検出器にイベントデータを渡して解析・ヒストグラム充填
   for (auto analyzer : fAnalyzers) {
     analyzer->Process();
   }
 
-  gSystem->ProcessEvents();
+  fDatime.Set();
+  fServerTime->SetTitle(fDatime.AsSQLString());
   
   return true;
 }

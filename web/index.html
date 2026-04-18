@@ -9,28 +9,41 @@
 
     <div style="display: flex;">
       <div id="sidebar">
-        <h3 style="padding: 5px;">Histogram List</h3>
+
+	<div id="status-bar" style="padding: 10px;">
+	  <span id="status-info" style="font-weight: bold;">Status</span>
+	  </BR>
+	  <span id="server-date-time">date-time</span>
+	</div>
+	
+	<div class="controls">
+	  <button id="runBtn" style="width: 150px; padding: 5px 15px; border: none; cursor: pointer;">---</button>
+	  <span id="page-info" style="flex: 1; font-weight: bold;">(Page -/-)</span>
+	  
+	    <div style="flex: 1;">
+              Page: <input type="number" id="inputPage" value="1" min="1" style="width: 50px;">
+	    </div>
+	    <div style="flex: 1;">
+              Rows: <input type="number" id="inputRows" value="3" min="1" max="5" style="width: 40px;">
+	    </div>
+	    <div style="flex: 1;">
+              Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
+	    </div>
+	</div>
+
+	<h4 style="padding: 10px;">Histograms</h4>
         <ul id="hist-list" style="list-style: none;"></ul>
+
+	<div class="hist-controls">
+	  <button id="resetBtn" style="flex: 1; width: 150px; padding: 5px 15px; border: none; cursor: pointer;">
+          Reset events
+	  </button>
+	</div>
+	
       </div>
 
       <div id="main-content">
-
-	<div class="controls">
-	  <button id="runBtn" style="background-color: green; color: black; padding: 5px 15px; border: none; cursor: pointer;">Run</button>
-	  <button id="pauseBtn" style="background-color: red; color: black; padding: 5px 15px; border: none; cursor: pointer;">Pause</button>
-	  <span id="status-info" style="font-weight: bold; font-family: monospace;"></span>
-	  
-	  <div id="edit-controls" style="display: flex; gap: 10px; align-items: center;">
-            Rows: <input type="number" id="inputRows" value="3" min="1" max="5" style="width: 40px;">
-            Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
-            Page: <input type="number" id="inputPage" value="1" min="1" style="width: 50px;">
-	  </div>
-    
-	  <span id="page-info" style="font-weight: bold; font-family: monospace;"></span>
-	</div>
-
         <div id="grid-container"></div>
-
       </div>
 
       <script src="script.js" type="module"></script>

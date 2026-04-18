@@ -1,5 +1,5 @@
 {
     "hTest0": { "xbins": 100, "xmin": 0, "xmax": 200 },
     "hTest1": { "xbins": 100, "xmin": 0, "xmax": 50 },
-    "htemp": { "xbins": 100, "xmin": 0, "xmax": 100, "ybins": 100, "ymin": 0, "ymax": 100}
+    "hTest10": { "xbins": 100, "xmin": 0, "xmax": 150, "ybins": 100, "ymin": 0, "ymax": 3000}
 }

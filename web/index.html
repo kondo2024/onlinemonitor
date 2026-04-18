@@ -21,7 +21,11 @@
 	  <span id="page-info" style="flex: 1; font-weight: bold;">(Page -/-)</span>
 
 	  <div id="process-warning" style="display: none; color: #d9534f; ; padding: 10px;">
-	    Server disconnected, please check smonlinemonitor process
+	    Please check smonlinemonitor process
+	  </div>
+	  
+	  <div id="data-warning" style="display: none; color: #d9534f; ; padding: 10px;">
+	    No data accumulation, check Beam/DAQ
 	  </div>
 	  
 	    <div style="flex: 1;">
@@ -33,6 +37,8 @@
 	    <div style="flex: 1;">
               Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
 	    </div>
+
+	    <button id="drawBtn" style="width: 150px; padding: 5px 15px; border: none; cursor: pointer;">Draw</button>	    
 	</div>
 
 	<h4 style="padding: 10px;">Histograms</h4>

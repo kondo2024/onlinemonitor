@@ -40,6 +40,7 @@ bool DisplayManager::Initialize() {
   if (!fHttpServer) return false;
   
   fHttpServer->AddLocation("onlinemonitor/", "web/"); //root dir of URL is web
+  fHttpServer->AddLocation("config/", "config/"); //root dir of URL is web
   fHttpServer->SetDefaultPage("index.html");
   fHttpServer->SetReadOnly(kFALSE);
 

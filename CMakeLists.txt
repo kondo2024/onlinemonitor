@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(smonlinemonitor LANGUAGES CXX)
 
-find_package(ROOT REQUIRED COMPONENTS Net Core RIO Hist Tree Gui RHTTP)
+find_package(ROOT REQUIRED COMPONENTS Net Core RIO Hist Tree Gui RHTTP Thread)
 include(${ROOT_USE_FILE})
 
 set(CMAKE_CXX_STANDARD 17)

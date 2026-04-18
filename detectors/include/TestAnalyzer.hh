@@ -17,9 +17,8 @@ public:
 			    Form("Test Histogram %d;Value;Counts",i),
 			    100, 0, 100, "TestFolder");
       hTest[i]->SetMinimum(0);
-      hTest[i]->Print();
+      //hTest[i]->Print();
     }
-
     return true;
   }
 
@@ -27,13 +26,11 @@ public:
     for (int i=0;i<11;++i)
       hTest[i]->Fill(rand()%100 + i*10);
 
-//    hTest[0]->Print();
-//    std::cout<<hTest[0]->GetEntries()<<std::endl;
     return true;
   }
 
 private:
-  TH1* hTest[10];
+  TH1* hTest[11];
 };
 
 #endif

@@ -1,4 +1,5 @@
 #include "HistogramManager.hh"
+#include "ConfigManager.hh"
 #include <TROOT.h>
 #include <iostream>
 #include <fstream>
@@ -21,74 +22,43 @@ HistogramManager::~HistogramManager() {
   }
 }
 
-bool HistogramManager::Init(const std::string& configPath) {
-  LoadJSON(configPath);
-  return true;
-}
-
-void HistogramManager::LoadJSON(const std::string& path) {
-  std::ifstream ifs(path);
-  if (!ifs.is_open()) return;
-
-  try {
-    json j;
-    ifs >> j;
-    for (auto& [name, cfg] : j.items()) {
-      fConfigMap[name] = {cfg["bins"], {cfg["min"], cfg["max"]}};
-    }
-    std::cout << "[HistogramManager] Loaded configuration for " << fConfigMap.size() << " histograms." << std::endl;
-  } catch (std::exception& e) {
-    std::cerr << "[HistogramManager] JSON Parse Error: " << e.what() << std::endl;
-  }
-}
-
 TH1* HistogramManager::GetTH1(const std::string& name, const std::string& title, 
 			      int bins, double min, double max, const std::string& folder) {
     
-  if (fHistograms.count(name)) return fHistograms[name];
-
-  if (fConfigMap.count(name)) {
-    bins = fConfigMap[name].first;
-    min = fConfigMap[name].second.first;
-    max = fConfigMap[name].second.second;
-  }
-
   TH1* h = nullptr;
-  
-  if (!fHistograms.count(name)) {
-//  gROOT->mkdir(folder.c_str());
-//  gROOT->cd(folder.c_str());
+  if (fHistograms.count(name)) h = fHistograms[name];
+  else {
     h = new TH1F(name.c_str(), title.c_str(), bins, min, max);
     fHistograms[name] = h;
-
-  } else {// if hist exists
-    h = fHistograms[name];
-    TH2* h2 = dynamic_cast<TH2*>(h);
-
-    if (h2) {
-      // temptemptemp
-      if (h2->GetNbinsX() != bins || h2->GetXaxis()->GetXmin() != min) {
-        std::cout << "[HistogramManager] Updating TH2 bins for: " << name << std::endl;
-        // TH2::SetBins(nx, xmin, xmax, ny, ymin, ymax)
-        h2->SetBins(bins, min, max, bins, min, max);
-        h2->Reset("ICES");
-      }
-    } else {
-      if (h->GetNbinsX() != bins || h->GetXaxis()->GetXmin() != min || h->GetXaxis()->GetXmax() != max) {
-        std::cout << "[HistogramManager] Updating TH1 bins for: " << name << std::endl;
-        // TH1::SetBins(nx, xmin, xmax)
-        h->SetBins(bins, min, max);
-        h->Reset("ICES");
-      }
-    }
   }
 
+  const auto& config = ConfigManager::GetInstance()->GetJson();
+  if (config.contains("ranges") && config["ranges"].contains(name)) {
+    auto& r = config["ranges"][name];
+  
+    TH2* h2 = dynamic_cast<TH2*>(h);
+    if (h2 && r.contains("ybins")) {
+      h2->SetBins(r["xbins"], r["xmin"], r["xmax"], 
+		  r["ybins"], r["ymin"], r["ymax"]);
+      h2->Reset("ICES");
+      std::cout << "[HistogramManager] Updated TH2 bins/ranges for: " << name << std::endl;
+    } else {
+      h->SetBins(r["xbins"], r["xmin"], r["xmax"]);
+      h->Reset("ICES");
+      std::cout << "[HistogramManager] Updated TH1 bin/range for: " << name << std::endl;
+    }
+  }
   return h;
 }
 
 void HistogramManager::ResetAll() {
   std::cout << "[HistogramManager] Resetting all histograms..." << std::endl;
+  auto config = ConfigManager::GetInstance();
+  config->LoadConfig("config/config.json");
+  
+
   for (auto& pair : fHistograms) {
+    GetTH1(pair.second->GetName());// update hist axes if defined in json
     pair.second->Reset("ICES");
   }
 }

@@ -11,23 +11,26 @@ public:
   HistogramManager();
   virtual ~HistogramManager();
 
-  bool Init(const std::string& configPath);
-
-  TH1* GetTH1(const std::string& name, const std::string& title, 
-	      int bins, double min, double max, const std::string& folder = "Detectors");
+  TH1* GetTH1(const std::string& name, // input
+	      const std::string& title="",// inputs if necessary
+	      int bins=0, double min=0, double max=0,
+	      const std::string& folder = "Detectors");
+  // wapper
+  TH1* GetTH1(const char* name, const std::string& title="", 
+	      int bins=0, double min=0, double max=0,
+	      const std::string& folder = "Detectors"){
+    std::string name_s(name);
+    return GetTH1(name_s,title,bins,min,max,folder);
+  }
 
   void ResetAll();
 
-  void UpdateFromJSON(const std::string& configPath);
 
   void PrintListOfHistograms();
 
   
 private:
   std::map<std::string, TH1*> fHistograms;
-  std::map<std::string, std::pair<int, std::pair<double, double>>> fConfigMap; // name -> {bins, {min, max}}
-
-  void LoadJSON(const std::string& path);
 };
 
 extern HistogramManager* gHistManager;

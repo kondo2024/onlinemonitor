@@ -1,4 +1,10 @@
 #include "DisplayManager.hh"
+#include "HistogramManager.hh"
+#include "ConfigManager.hh"
+#include <THttpServer.h>
+#include <TNamed.h>
+#include <TInterpreter.h>
+
 #include <nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
@@ -6,67 +12,63 @@
 
 using json = nlohmann::json;
 
+extern "C" void Internal_EventReset() {
+  if (gHistManager) {
+    gHistManager->ResetAll();
+  } else {
+    std::cerr << "Error: gHistManager is null!" << std::endl;
+  }
+}
+
 DisplayManager* gDispManager = nullptr;
 
-DisplayManager::DisplayManager() : fTotalPages(0), fHistsPerPage(9) {
+DisplayManager::DisplayManager() : fHttpServer(nullptr) {
 }
 
 DisplayManager::~DisplayManager() {
 }
 
-bool DisplayManager::Init(const std::string& configPath) {
-  std::ifstream ifs(configPath);
-  if (!ifs.is_open()) return false;
+bool DisplayManager::Initialize() {
 
   try {
-    json j;
-    ifs >> j;
-        
-    // config.json 内の "display": { "hists_per_page": 9 } などを読み込む
-    if (j.contains("display")) {
-      fHistsPerPage = j["display"].value("hists_per_page", 9);
-    }
-
-    // 表示対象の全ヒストグラム名を取得
-    std::vector<std::string> allHists;
-    for (auto& det : j["detectors_config"]) {
-      for (auto& hName : det["histograms"]) {
-	allHists.push_back(hName);
-      }
-    }
-
-    // ページ分割ロジック
-    fTotalPages = std::ceil((double)allHists.size() / fHistsPerPage);
-    fPages.clear();
-        
-    for (int i = 0; i < fTotalPages; ++i) {
-      PageConfig pg;
-      for (int j = 0; j < fHistsPerPage; ++j) {
-	int idx = i * fHistsPerPage + j;
-	if (idx < allHists.size()) {
-	  pg.histogramNames.push_back(allHists[idx]);
-	}
-      }
-      fPages.push_back(pg);
-    }
-
-    std::cout << "[DisplayManager] Configured " << fTotalPages << " pages." << std::endl;
-    return true;
-
-  } catch (std::exception& e) {
-    std::cerr << "[DisplayManager] Error: " << e.what() << std::endl;
+    fHttpServer = new THttpServer("http:8080?cors");
+  } catch (...) {
+    std::cerr << "CRITICAL: Failed to allocate THttpServer" << std::endl;
     return false;
   }
+
+  if (!fHttpServer) return false;
+  
+  fHttpServer->AddLocation("onlinemonitor/", "web/"); //root dir of URL is web
+  fHttpServer->SetDefaultPage("index.html");
+  fHttpServer->SetReadOnly(kFALSE);
+
+  SetupHttpCommands(fHttpServer);
+
+  fServerTimeStr = new TNamed("ServerTime","Starting ...");
+  fServerTimeStr->SetBit(kCanDelete, kFALSE);  
+  fHttpServer->Register("/Status",fServerTimeStr);
+  
+  std::cout << "[DisplayManager] Initialized. Server at http://localhost:8080" << std::endl;
+  return true;
 }
 
-std::string DisplayManager::GetLayoutJSON() {
-  json j;
-  j["total_pages"] = fTotalPages;
-  j["hists_per_page"] = fHistsPerPage;
+void DisplayManager::SetupHttpCommands(THttpServer* serv) {
+  if (!serv) return;
+  long long funcAddr = (long long)(void*)Internal_EventReset;
+  TString code;
+  code.Form(
+	    "extern \"C\" void GlobalReset() { "
+	    "  auto f = (void (*)()) %lld; "
+	    "  if (f) f(); "
+	    "}", funcAddr);
     
-  for (int i = 0; i < fPages.size(); ++i) {
-    j["pages"][i] = fPages[i].histogramNames;
-  }
-    
-  return j.dump();
+  gInterpreter->Declare(code.Data());
+  serv->RegisterCommand("/ResetAll", "GlobalReset()");
+}
+
+
+void DisplayManager::SetServerTime() {
+  fDatime.Set();
+  fServerTimeStr->SetTitle(fDatime.AsSQLString());
 }

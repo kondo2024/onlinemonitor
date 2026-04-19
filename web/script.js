@@ -252,7 +252,6 @@ async function updateStatusInfo() {
 	    const port = state.settings.httpPort;
             const headPath = state.allPaths[0];
             const obj = await httpRequest(`http://localhost:${port}/${headPath}/root.json.gz`, "object");
-            //const obj = await httpRequest(`http://localhost:8080/${headPath}/root.json.gz`, "object");
 
             if (obj && obj.fEntries !== undefined) {
                 const currentEntries = obj.fEntries;

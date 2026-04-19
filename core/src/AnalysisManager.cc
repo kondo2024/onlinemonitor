@@ -56,7 +56,7 @@ bool AnalysisManager::ProcessEvent() {
   const int anaPeriod = 500;//ms, should be moved somewhere
   const int dispPeriod = 50;//ms
 
-  // analysis
+  // analysis is done during some period
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 

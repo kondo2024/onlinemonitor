@@ -24,15 +24,14 @@ void handle_signal(int sig) {
 }
 
 int main(int argc, char** argv) {
-  //TThread::Initialize();
-
   std::string mode = "web";// default
   std::string inputRIDFFile("");
+  std::string inputconfigfile("config/config.json");
 
   if (argc > 1) {
     std::string input1(argv[1]);
     if (input1 == "--help" || input1 == "-h" ){
-      std::cerr << "Usage: " << argv[0] << " [run0000.ridf]" << std::endl;
+      std::cerr << "Usage: " << argv[0] << " [run0000.ridf] [inputconfig.json]" << std::endl;
       return 1;
     }
 
@@ -43,6 +42,16 @@ int main(int argc, char** argv) {
       //return 1;
     }
     mode = "canvas";
+  }
+
+  if (argc > 2){
+    std::string input2(argv[2]);
+    inputconfigfile = argv[2];
+    std::ifstream ifs(inputconfigfile.c_str());
+    if (!ifs.good()){
+      std::cerr << "Error: cannot open file: " << inputconfigfile << std::endl;
+      return 1;
+    }
   }
 
   TApplication theApp("App", &argc, argv);
@@ -56,7 +65,7 @@ int main(int argc, char** argv) {
 
   //---------------------------------------------
   auto cm = ConfigManager::GetInstance();
-  cm->LoadConfig("config/config.json");
+  cm->LoadConfig(inputconfigfile);
 
   HistogramManager* histManager = HistogramManager::GetInstance();
 

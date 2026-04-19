@@ -11,14 +11,12 @@
       <div id="sidebar">
 
 	<div id="status-bar" style="padding: 10px;">
-	  <span id="status-info" style="font-weight: bold;">Status</span>
-	  </BR>
-	  <span id="server-date-time">date-time</span>
-	</div>
-	
-	<div class="controls">
 	  <button id="runBtn" style="width: 150px; padding: 5px 15px; border: none; cursor: pointer;">---</button>
-	  <span id="page-info" style="flex: 1; font-weight: bold;">(Page -/-)</span>
+	  Status:<br>
+	  <span id="status-info">----</span><BR>
+	  <span id="auto-reset-info">----</span><BR>
+	  <span id="server-date-time">date-time</span><BR>
+	  <span id="page-info" style="flex: 1;">(Page -/-)</span>
 
 	  <div id="process-warning" style="display: none; color: #d9534f; ; padding: 10px;">
 	    Please check smonlinemonitor process
@@ -27,7 +25,18 @@
 	  <div id="data-warning" style="display: none; color: #d9534f; ; padding: 10px;">
 	    No data accumulation, check Beam/DAQ
 	  </div>
-	  
+	</div>
+	
+	<div class="hist-controls">
+	  Histograms
+          <ul id="hist-list" style="list-style: none;"></ul>
+
+	  <button id="resetBtn" style="flex: 1; width: 150px; padding: 5px 15px; border: none; cursor: pointer;">
+            Reset histograms
+	  </button>
+	</div>
+
+	<div class="controls">
 	    <div style="flex: 1;">
               Page: <input type="number" id="inputPage" value="1" min="1" style="width: 50px;">
 	    </div>
@@ -37,18 +46,13 @@
 	    <div style="flex: 1;">
               Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
 	    </div>
+	    <div style="flex: 1;">
+              Interval (sec): <input type="number" id="inputInterval" value="8" min="5" max="60" style="width: 40px;">
+	    </div>
 
 	    <button id="drawBtn" style="width: 150px; padding: 5px 15px; border: none; cursor: pointer;">Draw</button>	    
 	</div>
 
-	<h4 style="padding: 10px;">Histograms</h4>
-        <ul id="hist-list" style="list-style: none;"></ul>
-
-	<div class="hist-controls">
-	  <button id="resetBtn" style="flex: 1; width: 150px; padding: 5px 15px; border: none; cursor: pointer;">
-          Reset histograms
-	  </button>
-	</div>
 	
       </div>
 

@@ -8,6 +8,8 @@ const state = {
         columns: 3,
         get histsPerPage() { return this.rows * this.columns; }
     },
+    autoReset: true,
+    autoResetEvents: 100000,
     isRunning: false,
     currentPage: 0,
     lastSuccessTime: Date.now(),
@@ -16,7 +18,8 @@ const state = {
     activePaths: [],
     lastTotalEntries: 0,
     lastEntryChangeTime: Date.now(),
-    updateTimer: null
+    updateTimer: null,
+    isBusyChecking: false
 };
 
 //---------------------------------------------------
@@ -24,8 +27,19 @@ async function init() {
     try {
 
 	const config = await httpRequest("config/config.json", "object");
-        state.defaultSkipPaths = config?.skip_histograms || [];
 
+	if (config?.display?.update_interval_ms) {
+            const configInterval = parseInt(config.display.update_interval_ms);
+            if (!localStorage.getItem('sm_interval')) state.settings.interval = configInterval;
+        }
+
+	state.autoReset = config?.auto_reset || false;
+        state.autoResetEvents = config?.auto_reset_events || 100000;
+	
+	if (config?.display?.default_rows) state.settings.rows = parseInt(config.display.default_rows);
+	if (config?.display?.default_columns) state.settings.columns = parseInt(config.display.default_columns);
+	
+        state.defaultSkipPaths = config?.skip_histograms || [];
 	const hierarchy = await httpRequest("http://localhost:8080/h.json", "object");
         if (!hierarchy) throw new Error("Cannot access h.json");
 
@@ -45,7 +59,15 @@ async function init() {
         showDisconnected(true);
     }
 }
-
+//---------------------------------------------------
+async function checkBusyStatus() {
+    try {
+        const res = await httpRequest("http://localhost:8080/Status/fIsBusy/root.json.gz", "object");
+        return res && res.fValue === 1;
+    } catch (e) {
+        return false;
+    }
+}
 //---------------------------------------------------
 function setupEventListeners() {
     const el = (id) => document.getElementById(id);
@@ -64,6 +86,10 @@ function setupEventListeners() {
         updateUIStates();
         drawGrid();
     };
+
+    
+    el('inputRows').value = state.settings.rows;
+    el('inputCols').value = state.settings.columns;
     
     const onLayoutChange = () => {
         state.settings.rows = parseInt(el('inputRows').value) || 1;
@@ -80,6 +106,13 @@ function setupEventListeners() {
         e.target.value = state.currentPage + 1;
     };
 
+    el('inputInterval').value = state.settings.interval / 1000; // ms -> sec
+    el('inputInterval').onchange = (e) => {
+        const newSec = parseFloat(e.target.value) || 5;
+        state.settings.interval = newSec * 1000;
+        localStorage.setItem('sm_interval', state.settings.interval);
+    };
+    
     el('resetBtn').onclick = async () => {
         if (!confirm("Reset all histograms?")) return;
         try {
@@ -99,12 +132,26 @@ function setupEventListeners() {
 //---------------------------------------------------
 function startMonitoring() {
     stopMonitoring();
-    state.updateTimer = setInterval(async () => {
+    const loop = async () => {
+        if (!state.isRunning) return;
+        
         const maxPage = Math.ceil(state.activePaths.length / state.settings.histsPerPage);
         state.currentPage = (state.currentPage + 1) >= maxPage ? 0 : state.currentPage + 1;
-        document.getElementById('inputPage').value = state.currentPage + 1;
+        const elPageInput = document.getElementById('inputPage');
+        if (elPageInput) elPageInput.value = state.currentPage + 1;
+        
         await drawGrid();
-    }, state.settings.interval);
+        state.updateTimer = setTimeout(loop, state.settings.interval);
+    };
+    state.updateTimer = setTimeout(loop, state.settings.interval);
+
+    
+//    state.updateTimer = setInterval(async () => {
+//        const maxPage = Math.ceil(state.activePaths.length / state.settings.histsPerPage);
+//        state.currentPage = (state.currentPage + 1) >= maxPage ? 0 : state.currentPage + 1;
+//        document.getElementById('inputPage').value = state.currentPage + 1;
+//        await drawGrid();
+//    }, state.settings.interval);
 }
 
 //---------------------------------------------------
@@ -117,6 +164,14 @@ function stopMonitoring() {
 
 //---------------------------------------------------
 async function drawGrid() {
+
+    const isBusy = await checkBusyStatus();
+    if (isBusy) {
+        console.log("Server is busy (Analysis in progress). Retrying in 100ms...");
+        setTimeout(() => drawGrid(), 100);
+        return;
+    }
+
     await updateStatusInfo();
     
     const container = document.getElementById('grid-container');
@@ -141,14 +196,26 @@ async function drawGrid() {
         const divId = `draw_div_${i}`;
         const wrapper = document.createElement('div');
         wrapper.className = 'grid-wrapper';
+	wrapper.style.position = 'relative';
         wrapper.innerHTML = `<div id="${divId}" class="grid-item"></div>`;
+	if (state.isRunning) {
+	    const cover = document.createElement('div');
+	    cover.style.position = 'absolute';
+	    cover.style.top = '0';
+	    cover.style.left = '0';
+	    cover.style.width = '100%';
+	    cover.style.height = '100%';
+	    cover.style.zIndex = '100'; 
+	    cover.style.background = 'rgba(255, 255, 255, 0)';
+	    cover.style.cursor = 'not-allowed';
+	    wrapper.appendChild(cover);
+	}
+	
         container.appendChild(wrapper);
 
         try {
             const obj = await httpRequest(`http://localhost:8080/${path}/root.json.gz`, "object");
-            if (obj) {
-		await redraw(divId, obj, "colz");
-	    }
+            if (obj) await redraw(divId, obj, "colz");
         } catch (e) {
             console.error(`Failed to draw ${path}:`, e);
         }
@@ -188,6 +255,11 @@ async function updateStatusInfo() {
                         elDataWarn.style.display = "block";
                     }
                 }
+		// auto reset
+		if (state.autoReset && currentEntries >= state.autoResetEvents) {
+                    console.log(`Auto Reset triggered: ${currentEntries} entries reached.`);
+                    await performAutoReset();
+		}
             }
         }	
     } catch (err) {
@@ -206,11 +278,17 @@ function updateUIStates() {
     const el = (id) => document.getElementById(id);
     const runBtn = el('runBtn');
     const status = el('status-info');
-    const inputs = [el('inputRows'), el('inputCols'), el('inputPage'), el('drawBtn'), el('resetBtn')];
+    const autoReset = el('auto-reset-info');
+    const inputs = [el('inputRows'), el('inputCols'), el('inputPage'), el('inputInterval'), el('drawBtn'), el('resetBtn')];
 
-    runBtn.textContent = state.isRunning ? 'Pause' : 'Auto Update ON';
+    runBtn.innerHTML = state.isRunning ? 'Auto Update<br>ON => OFF' : 'Auto Update<br>OFF => ON';
     if (status) status.innerText = state.isRunning ? 'Auto Update ON' : 'Auto Update OFF';
 
+    if (autoReset) {
+	autoReset.innerText = state.autoReset ? 'Auto Reset ON' : 'Auto Reset OFF';
+	if (state.autoReset) autoReset.innerText += "\n(" + state.autoResetEvents +" events)";
+    }
+    
     inputs.forEach(input => {
         if (!input) return;
         input.disabled = state.isRunning;
@@ -280,9 +358,27 @@ function updateHistList() {
         container.appendChild(li);
     });
 }
+//---------------------------------------------------
+async function performAutoReset() {
+    try {
+        const originalAutoReset = state.autoReset;
+        state.autoReset = false; 
 
-////---------------------------------------------------
-////---------------------------------------------------
+        await httpRequest("/ResetAll/cmd.json", "text");
+        console.log("Auto reset successful.");
+
+        state.lastTotalEntries = 0;
+        state.lastEntryChangeTime = Date.now();
+
+        setTimeout(() => {// wait for 2000ms
+            state.autoReset = originalAutoReset;
+        }, 2000);
+
+    } catch (err) {
+        console.error("Auto Reset Failed:", err);
+    }
+}
+//---------------------------------------------------
 init();
 
 //---------------------------------------------------

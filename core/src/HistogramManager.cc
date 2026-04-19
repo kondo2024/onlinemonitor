@@ -11,11 +11,13 @@ using json = nlohmann::json;
 
 HistogramManager* gHistManager = nullptr;
 
-HistogramManager::HistogramManager() {
+HistogramManager::HistogramManager()
+  : fResetAllRequested(false)
+{
   gHistManager = this;
 }
 
-HistogramManager::~HistogramManager() {
+HistogramManager::~HistogramManager(){
   std::cout<<"~HistogramManager"<<std::endl;
   for (auto& pair : fHistograms) {
     if (pair.second) delete pair.second;
@@ -67,6 +69,11 @@ TH1* HistogramManager::GetTH2(const std::string& name, const std::string& title,
     }
   }
   return h;
+}
+
+void HistogramManager::RequestResetAll() {
+  fResetAllRequested = true;
+  std::cout << "[HistogramManager] ResetAll requested via HTTP." << std::endl;
 }
 
 void HistogramManager::ResetAll() {

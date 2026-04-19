@@ -4,8 +4,11 @@
     "skip_histograms":[
 	"hTest2"
     ],
+    "auto_reset": true,
+    "auto_reset_events": 10000000,
     "display": {
-	"default_hists_per_page": 9,
+	"update_interval_ms": 8000,
+	"default_rows": 3,
 	"default_columns": 3
     }
 }

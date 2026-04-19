@@ -21,6 +21,8 @@ public:
 
   void Finalize();
 
+  void SetDisplayManager(DisplayManager* displayManager){fDispManager = displayManager;}
+  
 private:
   TArtEventStore* fEventStore;
 

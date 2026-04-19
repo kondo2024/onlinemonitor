@@ -48,10 +48,34 @@ bool AnalysisManager::Initialize() {
 }
 
 bool AnalysisManager::ProcessEvent() {
-  //if (!fEventStore->GetNextEvent()) return false;
-  for (auto analyzer : fAnalyzers) {
-    analyzer->Process();
+  const int anaPeriod = 500;//ms
+  const int dispPeriod = 50;//ms
+
+  // analysis
+  auto startAnalysis = std::chrono::steady_clock::now();
+  while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
+
+    //if (!fEventStore->GetNextEvent()) return false;
+    for (auto analyzer : fAnalyzers) {
+      analyzer->Process();
+    }
   }
+  fDispManager->SetServerTime();
+
+  // accept http requests
+  fDispManager->SetBusy(0);
+  auto startHttp = std::chrono::steady_clock::now();
+  while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
+    gSystem->ProcessEvents();
+    gSystem->Sleep(1);
+  }
+  
+  if (fHistManager->IsResetAllRequested()){
+    fHistManager->ResetAll();
+    fHistManager->ClearResetAllRequest();
+  }
+  fDispManager->SetBusy(1);// busy
+  
   return true;
 }
 

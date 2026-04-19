@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   signal(SIGINT, handle_signal);
 
   std::cout << "============================================" << std::endl;
-  std::cout << "  SAMURAI Online Monitor Starting...        " << std::endl;
+  std::cout << "  Online Monitor Starting...                " << std::endl;
   std::cout << "============================================" << std::endl;
 
 
@@ -34,28 +34,42 @@ int main(int argc, char** argv) {
 
   HistogramManager* histManager = new HistogramManager();
   
-  AnalysisManager* analysisManager = new AnalysisManager(histManager);
-  if (!analysisManager->Initialize()) {
-    std::cerr << "[Main] Error: AnalysisManager initialization failed." << std::endl;
-    return 1;
-  }
 
   DisplayManager* displayManager = new DisplayManager();
   if (!displayManager->Initialize()){
     std::cerr << "[Main] Error: DisplayManager initialization failed." << std::endl;
     return 1;
   }
-    
+  AnalysisManager* analysisManager = new AnalysisManager(histManager);
+  if (!analysisManager->Initialize()) {
+    std::cerr << "[Main] Error: AnalysisManager initialization failed." << std::endl;
+    return 1;
+  }
+  analysisManager->SetDisplayManager(displayManager);
+  
   std::cout << "[Main] Start analysis loop. Press Ctrl+C to stop." << std::endl;
-    
+
   while (!gStopAnalysis) {
+
+
     if (!analysisManager->ProcessEvent()) {
       gSystem->Sleep(100); 
     }
 
-    displayManager->SetServerTime();
+//
+//    auto startAnalysis = std::chrono::steady_clock::now();
+//    while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
+//    }
+//
+//    // accept http requests
+//    displayManager->SetBusy(0);
+//    auto startHttp = std::chrono::steady_clock::now();
+//    while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
+//      gSystem->ProcessEvents();
+//      gSystem->Sleep(1);
+//    }
+//    displayManager->SetBusy(1);// busy
 
-    gSystem->ProcessEvents();
   }
 
   std::cout << "[Main] Cleaning up..." << std::endl;

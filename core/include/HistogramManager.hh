@@ -35,6 +35,9 @@ public:
     return GetTH2(name_s,title,xbins,xmin,xmax,ybins,ymin,ymax,folder);
   }
 
+  void RequestResetAll();
+  bool IsResetAllRequested() const { return fResetAllRequested; }
+  void ClearResetAllRequest() { fResetAllRequested = false; }
   void ResetAll();
 
 
@@ -42,6 +45,7 @@ public:
 
   
 private:
+  bool fResetAllRequested;
   std::map<std::string, TH1*> fHistograms;
 };
 

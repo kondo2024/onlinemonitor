@@ -3,6 +3,7 @@
 #include "ConfigManager.hh"
 #include <THttpServer.h>
 #include <TNamed.h>
+#include <TParameter.h>
 #include <TInterpreter.h>
 
 #include <nlohmann/json.hpp>
@@ -14,7 +15,8 @@ using json = nlohmann::json;
 
 extern "C" void Internal_EventReset() {
   if (gHistManager) {
-    gHistManager->ResetAll();
+    //gHistManager->ResetAll();
+    gHistManager->RequestResetAll();
   } else {
     std::cerr << "Error: gHistManager is null!" << std::endl;
   }
@@ -22,7 +24,9 @@ extern "C" void Internal_EventReset() {
 
 DisplayManager* gDispManager = nullptr;
 
-DisplayManager::DisplayManager() : fHttpServer(nullptr) {
+DisplayManager::DisplayManager()
+  : fHttpServer(nullptr)
+{
 }
 
 DisplayManager::~DisplayManager() {
@@ -49,6 +53,8 @@ bool DisplayManager::Initialize() {
   fServerTimeStr = new TNamed("ServerTime","Starting ...");
   fServerTimeStr->SetBit(kCanDelete, kFALSE);  
   fHttpServer->Register("/Status",fServerTimeStr);
+  fIsBusy = new TParameter<Int_t>("fIsBusy",1);
+  fHttpServer->Register("/Status",fIsBusy);
   
   std::cout << "[DisplayManager] Initialized. Server at http://localhost:8080" << std::endl;
   return true;

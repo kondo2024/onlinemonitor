@@ -39,6 +39,7 @@ target_link_libraries(onlinemonitor PRIVATE ${ANAROOT_LIBRARIES} ${ROOT_LIBRARIE
 
 target_include_directories(onlinemonitor PRIVATE $ENV{TARTSYS}/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
+target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzers/base/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzers/SAMURAI/include)
 
 target_compile_definitions(onlinemonitor PRIVATE "USE_THREADS")

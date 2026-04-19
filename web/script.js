@@ -3,6 +3,7 @@ import { redraw, httpRequest } from './jsroot/modules/main.mjs';
 //---------------------------------------------------
 const state = {
     settings: {
+	httpPort: 8080,
         interval: parseInt(localStorage.getItem('sm_interval')) || 8000,
         rows: 3,
         columns: 3,
@@ -28,6 +29,9 @@ async function init() {
 
 	const config = await httpRequest("config/config.json", "object");
 
+	if (config?.http_port) state.settings.httpPort = parseInt(config.http_port);
+	const port = state.settings.httpPort;
+	
 	if (config?.display?.update_interval_ms) {
             const configInterval = parseInt(config.display.update_interval_ms);
             if (!localStorage.getItem('sm_interval')) state.settings.interval = configInterval;
@@ -40,7 +44,8 @@ async function init() {
 	if (config?.display?.default_columns) state.settings.columns = parseInt(config.display.default_columns);
 	
         state.defaultSkipPaths = config?.skip_histograms || [];
-	const hierarchy = await httpRequest("http://localhost:8080/h.json", "object");
+	//const hierarchy = await httpRequest("http://localhost:8080/h.json", "object");
+	const hierarchy = await httpRequest(`http://localhost:${port}/h.json`, "object");
         if (!hierarchy) throw new Error("Cannot access h.json");
 
         state.allPaths = [];
@@ -62,7 +67,9 @@ async function init() {
 //---------------------------------------------------
 async function checkBusyStatus() {
     try {
-        const res = await httpRequest("http://localhost:8080/Status/fIsBusy/root.json.gz", "object");
+	const port = state.settings.httpPort;
+        //const res = await httpRequest("http://localhost:8080/Status/fIsBusy/root.json.gz", "object");
+        const res = await httpRequest(`http://localhost:${port}/Status/fIsBusy/root.json.gz`, "object");
         return res && res.fValue === 1;
     } catch (e) {
         return false;
@@ -214,7 +221,10 @@ async function drawGrid() {
         container.appendChild(wrapper);
 
         try {
-            const obj = await httpRequest(`http://localhost:8080/${path}/root.json.gz`, "object");
+
+	    const port = state.settings.httpPort;
+            //const obj = await httpRequest(`http://localhost:8080/${path}/root.json.gz`, "object");
+            const obj = await httpRequest(`http://localhost:${port}/${path}/root.json.gz`, "object");
             if (obj) await redraw(divId, obj, "colz");
         } catch (e) {
             console.error(`Failed to draw ${path}:`, e);
@@ -239,8 +249,10 @@ async function updateStatusInfo() {
         }
 
 	if (state.allPaths.length > 0) {
+	    const port = state.settings.httpPort;
             const headPath = state.allPaths[0];
-            const obj = await httpRequest(`http://localhost:8080/${headPath}/root.json.gz`, "object");
+            const obj = await httpRequest(`http://localhost:${port}/${headPath}/root.json.gz`, "object");
+            //const obj = await httpRequest(`http://localhost:8080/${headPath}/root.json.gz`, "object");
 
             if (obj && obj.fEntries !== undefined) {
                 const currentEntries = obj.fEntries;

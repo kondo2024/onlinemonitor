@@ -11,7 +11,7 @@ public:
   BaseAnalyzer(const std::string& name) : fName(name) {}
   virtual ~BaseAnalyzer() {}
 
-  virtual bool Init(HistogramManager* hm) = 0;
+  virtual bool Init() = 0;
   virtual bool Process() = 0;
   virtual void Reset() {}
 

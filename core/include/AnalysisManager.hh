@@ -13,15 +13,11 @@ class BaseAnalyzer;
 
 class AnalysisManager {
 public:
-  AnalysisManager(HistogramManager* histManager);
+  AnalysisManager(std::string ridffile);;
   virtual ~AnalysisManager();
 
   bool Initialize();
-
   bool ProcessEvent();
-
-  void Finalize();
-
   void SetDisplayOutput(DisplayOutput* output){
     fDispOutput = output;
     fDispOutput->RegisterAnalysisStatus(&fAnalysisBusy);
@@ -30,7 +26,6 @@ public:
 private:
   TArtEventStore* fEventStore;
 
-  HistogramManager* fHistManager;
   DisplayOutput* fDispOutput;
 
   std::vector<BaseAnalyzer*> fAnalyzers;

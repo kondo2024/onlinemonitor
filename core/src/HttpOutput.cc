@@ -1,22 +1,23 @@
 #include "HttpOutput.hh"
 #include "HistogramManager.hh"
+#include "ConfigManager.hh"
 #include <THttpServer.h>
 #include <TNamed.h>
-#include <TParameter.h>
 #include <TInterpreter.h>
 #include <TSystem.h>
 #include <iostream>
 
 extern "C" void Internal_GlobalReset() {
-  if (gHistManager) {
-    gHistManager->RequestResetAll();
-  } else {
-    std::cerr << "Error: gHistManager is null!" << std::endl;
-  }
+//  if (gHistManager) {
+//    gHistManager->RequestResetAll();
+//  } else {
+//    std::cerr << "Error: gHistManager is null!" << std::endl;
+//  }
+  HistogramManager::GetInstance()->RequestResetAll();
 }
 
 HttpOutput::HttpOutput()
-  : fHttpServer(nullptr), fServerTimeStr(nullptr), fIsAnalysisBusy(nullptr) {
+  : fHttpServer(nullptr), fServerTimeStr(nullptr) {
 }
 
 HttpOutput::~HttpOutput() {
@@ -24,8 +25,18 @@ HttpOutput::~HttpOutput() {
 }
 
 bool HttpOutput::Initialize() {
+
+
+  const auto& config = ConfigManager::GetInstance()->GetJson();
+  int port = 8080;
+  if (config.contains("http_port"))
+    port = config["http_port"];
+  std::cout<<"[HttpOutput] port:"<<port<<std::endl;
+
   try {
-    fHttpServer = new THttpServer("http:8080?cors");
+    //fHttpServer = new THttpServer("http:8080?cors");
+    TString str = Form("http:%d",port);
+    fHttpServer = new THttpServer(str.Data());
   } catch (...) {
     std::cerr << "CRITICAL: Failed to allocate THttpServer" << std::endl;
     return false;
@@ -43,7 +54,7 @@ bool HttpOutput::Initialize() {
   fServerTimeStr = new TNamed("ServerTime", "Starting ...");
   fHttpServer->Register("/Status", fServerTimeStr);
 
-  std::cout << "[HttpOutput] Web Server initialized at http://localhost:8080" << std::endl;
+  std::cout << "[HttpOutput] Web Server initialized at http://localhost:"<<port << std::endl;
   return true;
 }
 
@@ -56,11 +67,8 @@ void HttpOutput::RegisterAnalysisStatus(Int_t* busyPtr) {
 
 void HttpOutput::Update() {
   if (!fHttpServer) return;
-
   RefreshServerTime();
-
-  // accept http requests
-  gSystem->ProcessEvents();
+  gSystem->ProcessEvents();// accept http requests
 }
 
 void HttpOutput::RefreshServerTime() {

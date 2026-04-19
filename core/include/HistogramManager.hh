@@ -4,36 +4,35 @@
 #include <string>
 #include <map>
 #include <TH1.h>
+#include <TH2.h>
 #include <TDirectory.h>
 
 class HistogramManager {
 public:
-  HistogramManager();
-  virtual ~HistogramManager();
 
-  TH1* GetTH1(const std::string& name, // input
-	      const std::string& title="",// inputs if necessary
-	      int bins=0, double min=0, double max=0,
-	      const std::string& folder = "Detectors");
-  TH1* GetTH2(const std::string& name, // input
-	      const std::string& title="",// inputs if necessary
-	      int xbins=0, double xmin=0, double xmax=0,
-	      int ybins=0, double ymin=0, double ymax=0,
-	      const std::string& folder = "Detectors");
-  // wapper
-  TH1* GetTH1(const char* name, const std::string& title="", 
-	      int bins=0, double min=0, double max=0,
-	      const std::string& folder = "Detectors"){
-    std::string name_s(name);
-    return GetTH1(name_s,title,bins,min,max,folder);
+  // singleton
+  static HistogramManager* GetInstance() {
+    static HistogramManager instance;
+    return &instance;
   }
-  TH1* GetTH2(const char* name, const std::string& title="", 
-	      int xbins=0, double xmin=0, double xmax=0,
-	      int ybins=0, double ymin=0, double ymax=0,
-	      const std::string& folder = "Detectors"){
-    std::string name_s(name);
-    return GetTH2(name_s,title,xbins,xmin,xmax,ybins,ymin,ymax,folder);
-  }
+  HistogramManager(const HistogramManager&) = delete;
+  HistogramManager& operator=(const HistogramManager&) = delete;
+
+  TH1* BookTH1(const std::string& name,
+	      const std::string& title,
+	      int bins, double min, double max,
+	      const std::string& folder = "Detectors");
+  TH1* BookTH2(const std::string& name,
+	       const std::string& title,
+	       int xbins, double xmin, double xmax,
+	       int ybins, double ymin, double ymax,
+	       const std::string& folder = "Detectors");
+
+  void ChangeRangeTH1(TH1* h);
+  void ChangeRangeTH2(TH1* h);
+  
+  TH1* GetTH1(const std::string& name);
+  TH2* GetTH2(const std::string& name);
 
   void RequestResetAll();
   bool IsResetAllRequested() const { return fResetAllRequested; }
@@ -41,14 +40,18 @@ public:
   void ResetAll();
 
 
+  std::vector<std::string> GetAllNames();
+  
   void PrintListOfHistograms();
 
   
 private:
-  bool fResetAllRequested;
-  std::map<std::string, TH1*> fHistograms;
-};
+  HistogramManager();
+  virtual ~HistogramManager();
 
-extern HistogramManager* gHistManager;
+  bool fResetAllRequested;
+  std::map<std::string, TH1*> fHistogramsMap;
+  std::vector<TH1*> fHistograms;
+};
 
 #endif

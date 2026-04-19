@@ -15,13 +15,17 @@
 using json = nlohmann::json;
 
 
-AnalysisManager::AnalysisManager(HistogramManager* histManager) 
-  : fEventStore(nullptr), fHistManager(histManager),
-    fAnalysisBusy(1)
+AnalysisManager::AnalysisManager(std::string ridffile) 
+  : fEventStore(nullptr), fAnalysisBusy(1)
 {}
 
 AnalysisManager::~AnalysisManager() {
-  Finalize();
+  for (auto analyzer : fAnalyzers) {
+    delete analyzer;
+  }
+  fAnalyzers.clear();
+
+  if (fEventStore) delete fEventStore;
 }
 
 bool AnalysisManager::Initialize() {
@@ -36,7 +40,7 @@ bool AnalysisManager::Initialize() {
   }
 
   for (auto analyzer : fAnalyzers) {
-    analyzer->Init(fHistManager);
+    analyzer->Init();
   }
 
   fEventStore = new TArtEventStore();
@@ -71,23 +75,14 @@ bool AnalysisManager::ProcessEvent() {
     fDispOutput->Update();
     gSystem->Sleep(1);
   }
+
   
-  if (fHistManager->IsResetAllRequested()){
-    fHistManager->ResetAll();
-    fHistManager->ClearResetAllRequest();
+  if (HistogramManager::GetInstance()->IsResetAllRequested()){
+    HistogramManager::GetInstance()->ResetAll();
+    HistogramManager::GetInstance()->ClearResetAllRequest();
   }
+
   fAnalysisBusy = 1;
   
   return true;
-}
-
-void AnalysisManager::Finalize() {
-  for (auto analyzer : fAnalyzers) {
-    delete analyzer;
-  }
-  fAnalyzers.clear();
-
-  //if (fEventStore) delete fEventStore;// segmentation fault
-  //if (fHttpServer) delete fHttpServer;// segmentation fault
-  //if (fHistManager) delete fHistManager;// segmentation fault
 }

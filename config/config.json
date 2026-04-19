@@ -2,13 +2,14 @@
     "analyzers": ["Test"],
     "hist_range_file": "config/hist_ranges.json",
     "skip_histograms":[
-	"hTest2"
+	"aaa"
     ],
     "auto_reset": true,
-    "auto_reset_events": 10000000,
+    "auto_reset_events": 100000000,
     "display": {
 	"update_interval_ms": 8000,
 	"default_rows": 3,
 	"default_columns": 3
-    }
+    },
+    "http_port": 8080
 }

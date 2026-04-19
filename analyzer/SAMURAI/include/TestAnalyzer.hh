@@ -10,16 +10,17 @@ class TestAnalyzer : public BaseAnalyzer {
 public:
   TestAnalyzer() : BaseAnalyzer("Test") {}
 
-  bool Init(HistogramManager* hm) override {
+  bool Init() override {
 
+    HistogramManager* hm = HistogramManager::GetInstance();
+    
     for (int i=0;i<10;++i){
-      hTest[i] = hm->GetTH1(Form("hTest%d",i),
+      hTest[i] = hm->BookTH1(Form("hTest%d",i),
 			    Form("Test Histogram %d;Value;Counts",i),
 			    100, 0, 100, "TestFolder");
       hTest[i]->SetMinimum(0);
-      //hTest[i]->Print();
     }
-    hTest[10] = hm->GetTH2("hTest10","Test 2D Histogram;xval;yval",
+    hTest[10] = hm->BookTH2("hTest10","Test 2D Histogram;xval;yval",
 			   100,0,100,50,0,200,"TestFolder");
     return true;
   }
@@ -29,7 +30,6 @@ public:
       hTest[i]->Fill(rand()%100 + i*10);
 
     hTest[10]->Fill(rand()%100,rand()%100);
-
     
     return true;
   }

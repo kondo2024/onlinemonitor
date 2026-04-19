@@ -3,6 +3,7 @@
 
 #include <string>
 #include <Rtypes.h>
+#include <TParameter.h>
 
 class DisplayOutput {
 public:
@@ -11,10 +12,16 @@ public:
   virtual bool Initialize() = 0;
   virtual void Update() = 0;
   virtual void RegisterAnalysisStatus(Int_t* busyPtr) = 0;
-  static DisplayOutput* Create(const std::string& mode);
 
+  virtual bool IsKeyPressed(){return false;}
+  virtual int ExecuteKeyCommand(){return 0;}
+  
 protected:
-  DisplayOutput() {}
+  DisplayOutput()
+    : fIsAnalysisBusy(nullptr)
+  {}
+  TParameter<Int_t>* fIsAnalysisBusy;
+
 };
 
 #endif

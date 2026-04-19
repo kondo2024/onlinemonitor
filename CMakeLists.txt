@@ -10,8 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-Wall -Wextra -pthread)
 
 file(GLOB_RECURSE CORE_SOURCES "core/src/*.cc")
-file(GLOB_RECURSE ANALYZER_SOURCES "analyzers/*/src/*.cc")
-file(GLOB_RECURSE HEADERS "core/include/*.hh" "analyzers/*/include/*.hh")
+file(GLOB_RECURSE ANALYZER_SOURCES "analyzer/*/src/*.cc")
+file(GLOB_RECURSE HEADERS "core/include/*.hh" "analyzer/*/include/*.hh")
 
 set(MAIN_SOURCE "onlinemonitor.cc")
 
@@ -39,8 +39,8 @@ target_link_libraries(onlinemonitor PRIVATE ${ANAROOT_LIBRARIES} ${ROOT_LIBRARIE
 
 target_include_directories(onlinemonitor PRIVATE $ENV{TARTSYS}/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
-target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzers/base/include)
-target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzers/SAMURAI/include)
+target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzer/base/include)
+target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzer/SAMURAI/include)
 
 target_compile_definitions(onlinemonitor PRIVATE "USE_THREADS")
 

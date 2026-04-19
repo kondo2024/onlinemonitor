@@ -1,7 +1,7 @@
 #include "AnalysisManager.hh"
 #include "ConfigManager.hh"
 #include "HistogramManager.hh"
-#include "DisplayManager.hh"
+#include "DisplayOutput.hh"
 #include "TestAnalyzer.hh"
 // #include "BDCAnalyzer.hh"
 
@@ -16,7 +16,8 @@ using json = nlohmann::json;
 
 
 AnalysisManager::AnalysisManager(HistogramManager* histManager) 
-  : fEventStore(nullptr), fHistManager(histManager)
+  : fEventStore(nullptr), fHistManager(histManager),
+    fAnalysisBusy(1)
 {}
 
 AnalysisManager::~AnalysisManager() {
@@ -48,7 +49,7 @@ bool AnalysisManager::Initialize() {
 }
 
 bool AnalysisManager::ProcessEvent() {
-  const int anaPeriod = 500;//ms
+  const int anaPeriod = 500;//ms, should be moved somewhere
   const int dispPeriod = 50;//ms
 
   // analysis
@@ -60,13 +61,14 @@ bool AnalysisManager::ProcessEvent() {
       analyzer->Process();
     }
   }
-  fDispManager->SetServerTime();
 
   // accept http requests
-  fDispManager->SetBusy(0);
+  fAnalysisBusy = 0;
   auto startHttp = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
-    gSystem->ProcessEvents();
+    //    gSystem->ProcessEvents();// called in DisplayOutput
+
+    fDispOutput->Update();
     gSystem->Sleep(1);
   }
   
@@ -74,7 +76,7 @@ bool AnalysisManager::ProcessEvent() {
     fHistManager->ResetAll();
     fHistManager->ClearResetAllRequest();
   }
-  fDispManager->SetBusy(1);// busy
+  fAnalysisBusy = 1;
   
   return true;
 }

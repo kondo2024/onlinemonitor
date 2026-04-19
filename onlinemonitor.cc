@@ -8,7 +8,10 @@
 #include "ConfigManager.hh"
 #include "HistogramManager.hh"
 #include "AnalysisManager.hh"
-#include "DisplayManager.hh"
+
+//#include "DisplayManager.hh"
+#include "HttpOutput.hh"
+//#include "CanvasOutput.hh"
 
 bool gStopAnalysis = false;
 
@@ -35,17 +38,39 @@ int main(int argc, char** argv) {
   HistogramManager* histManager = new HistogramManager();
   
 
-  DisplayManager* displayManager = new DisplayManager();
-  if (!displayManager->Initialize()){
-    std::cerr << "[Main] Error: DisplayManager initialization failed." << std::endl;
-    return 1;
+//  DisplayManager* displayManager = new DisplayManager();
+//  if (!displayManager->Initialize()){
+//    std::cerr << "[Main] Error: DisplayManager initialization failed." << std::endl;
+//    return 1;
+//  }
+
+
+  const auto& config = cm->GetJson();
+  std::string mode = "web";// default
+  if (config.contains("display") && config["display"].contains("mode"))
+    mode = config["display"]["mode"];
+
+  DisplayOutput* displayOutput = nullptr;
+  if (mode == "web" ){
+    displayOutput = new HttpOutput();
+  }else if  (mode == "canvas" ){
+    //displayOutput = new CanvasOutput();// not yet implemented
+  }else{
+    std::cerr << "[Main] unknown mode:" <<mode<< std::endl;
+    return false;
   }
+  
+  if (!displayOutput) {
+    std::cerr << "[DisplayManager] Failed to create DisplayOutput for mode:" << mode << std::endl;
+    return false;
+  }
+  
   AnalysisManager* analysisManager = new AnalysisManager(histManager);
   if (!analysisManager->Initialize()) {
     std::cerr << "[Main] Error: AnalysisManager initialization failed." << std::endl;
     return 1;
   }
-  analysisManager->SetDisplayManager(displayManager);
+  analysisManager->SetDisplayOutput(displayOutput);
   
   std::cout << "[Main] Start analysis loop. Press Ctrl+C to stop." << std::endl;
 

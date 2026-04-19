@@ -68,8 +68,7 @@ async function init() {
 async function checkBusyStatus() {
     try {
 	const port = state.settings.httpPort;
-        //const res = await httpRequest("http://localhost:8080/Status/fIsBusy/root.json.gz", "object");
-        const res = await httpRequest(`http://localhost:${port}/Status/fIsBusy/root.json.gz`, "object");
+        const res = await httpRequest(`http://localhost:${port}/Status/IsAnalysisBusy/root.json.gz`, "object");
         return res && res.fValue === 1;
     } catch (e) {
         return false;
@@ -251,10 +250,10 @@ async function updateStatusInfo() {
 	if (state.allPaths.length > 0) {
 	    const port = state.settings.httpPort;
             const headPath = state.allPaths[0];
-            const obj = await httpRequest(`http://localhost:${port}/${headPath}/root.json.gz`, "object");
-
-            if (obj && obj.fEntries !== undefined) {
-                const currentEntries = obj.fEntries;
+            const obj = await httpRequest(`http://localhost:${port}/Status/Entries/root.json.gz`, "object");
+	    
+            if (obj && obj.fValue !== undefined) {
+                const currentEntries = obj.fValue;
 
                 if (currentEntries > state.lastTotalEntries) {
                     state.lastTotalEntries = currentEntries;

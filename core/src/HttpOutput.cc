@@ -8,11 +8,6 @@
 #include <iostream>
 
 extern "C" void Internal_GlobalReset() {
-//  if (gHistManager) {
-//    gHistManager->RequestResetAll();
-//  } else {
-//    std::cerr << "Error: gHistManager is null!" << std::endl;
-//  }
   HistogramManager::GetInstance()->RequestResetAll();
 }
 
@@ -31,10 +26,12 @@ bool HttpOutput::Initialize() {
   int port = 8080;
   if (config.contains("http_port"))
     port = config["http_port"];
-  std::cout<<"[HttpOutput] port:"<<port<<std::endl;
+  std::cout<<"[HttpOutput] port = "<<port<<std::endl;
 
+  const char* home = std::getenv("ONLINEMONITOR_HOME");
+  std::string http_root = std::string(home) + "/web/";
+  std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
-    //fHttpServer = new THttpServer("http:8080?cors");
     TString str = Form("http:%d",port);
     fHttpServer = new THttpServer(str.Data());
   } catch (...) {
@@ -44,8 +41,7 @@ bool HttpOutput::Initialize() {
 
   if (!fHttpServer) return false;  
 
-  fHttpServer->AddLocation("onlinemonitor/", "web/"); 
-  fHttpServer->AddLocation("config/", "config/");
+  fHttpServer->AddLocation("web/", http_root.c_str()); 
   fHttpServer->SetDefaultPage("index.html");
   fHttpServer->SetReadOnly(kFALSE);
 
@@ -54,15 +50,24 @@ bool HttpOutput::Initialize() {
   fServerTimeStr = new TNamed("ServerTime", "Starting ...");
   fHttpServer->Register("/Status", fServerTimeStr);
 
-  std::cout << "[HttpOutput] Web Server initialized at http://localhost:"<<port << std::endl;
+  std::cout << "[HttpOutput] Web Server initialized, visit http://localhost:"<<port<<"/web/index.html" << std::endl;
   return true;
 }
 
-void HttpOutput::RegisterAnalysisStatus(Int_t* busyPtr) {
-  if (!fHttpServer || !busyPtr) return;
+void HttpOutput::RegisterAnalysisStatus() {
+  if (!fHttpServer) return;
 
-  fIsAnalysisBusy = new TParameter<Int_t>("fIsBusy", *busyPtr);
-  fHttpServer->Register("/Status", fIsAnalysisBusy);
+  fIsAnalysisBusyPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusy);
+  fHttpServer->Register("/Status", fIsAnalysisBusyPrm);
+}
+
+void HttpOutput::RegisterEntries() {
+  if (!fHttpServer) return;
+
+  fEntriesPrm = new TParameter<Long64_t>("Entries", fEntries);
+  fHttpServer->Register("/Status", fEntriesPrm);
+
+  std::cout<<"HttpOutput: RegisterEntries"<<std::endl;  
 }
 
 void HttpOutput::Update() {

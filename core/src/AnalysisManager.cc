@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 
 AnalysisManager::AnalysisManager(std::string ridffile) 
-  : fEventStore(nullptr), fAnalysisBusy(1)
+  : fEventStore(nullptr), fAnalysisBusy(1), fEntries(0)
 {}
 
 AnalysisManager::~AnalysisManager() {
@@ -60,14 +60,19 @@ bool AnalysisManager::ProcessEvent() {
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
+
+    fDispOutput->SetAnalysisStatus(1);
     //if (!fEventStore->GetNextEvent()) return false;
     for (auto analyzer : fAnalyzers) {
       analyzer->Process();
     }
+    fEntries++;
+    //std::cout<<fDispOutput->GetEntries()<<std::endl;
   }
+  fDispOutput->SetAnalysisStatus(0);
+  fDispOutput->SetEntries(fEntries);
 
   // accept http requests
-  fAnalysisBusy = 0;
   auto startHttp = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
     //    gSystem->ProcessEvents();// called in DisplayOutput
@@ -80,9 +85,9 @@ bool AnalysisManager::ProcessEvent() {
   if (HistogramManager::GetInstance()->IsResetAllRequested()){
     HistogramManager::GetInstance()->ResetAll();
     HistogramManager::GetInstance()->ClearResetAllRequest();
+    fEntries = 0;
+    fDispOutput->SetEntries(fEntries);    
   }
-
-  fAnalysisBusy = 1;
   
   return true;
 }

@@ -52,9 +52,8 @@ bool CanvasOutput::Initialize() {
   return true;
 }
 
-void CanvasOutput::RegisterAnalysisStatus(Int_t* busyPtr) {
-  if (!busyPtr) return;
-  fIsAnalysisBusy = new TParameter<Int_t>("fIsBusy", *busyPtr);
+void CanvasOutput::RegisterAnalysisStatus() {
+  fIsAnalysisBusyPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusy);
 }
 
 void CanvasOutput::Update() {

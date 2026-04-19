@@ -14,7 +14,7 @@ public:
 
   bool Initialize() override;
   void Update() override;
-  void RegisterAnalysisStatus(Int_t* busyPtr) override;
+  void RegisterAnalysisStatus() override;
 
   void Draw();
 

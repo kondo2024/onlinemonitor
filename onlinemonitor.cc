@@ -4,7 +4,6 @@
 #include <TApplication.h>
 #include <TInterpreter.h>
 #include <TSystem.h>
-//#include <TThread.h>
 
 #include "ConfigManager.hh"
 #include "HistogramManager.hh"
@@ -18,15 +17,19 @@
 bool gStopAnalysis = false;
 
 void handle_signal(int sig) {
-  std::cout << "\n[Main] Signal (" << sig << ") received. Stopping analysis..." << std::endl;
+  std::cout << "\n[OnlineMonitor] Signal (" << sig << ") received. Stopping analysis..." << std::endl;
   gStopAnalysis = true;
 
 }
 
 int main(int argc, char** argv) {
   std::string mode = "web";// default
+  const char* home = std::getenv("ONLINEMONITOR_HOME");
+  if (!home){
+    std::cerr<<"[OnlineMonitor] ONLINEMONITOR_HOME not set, run setup_onlinemonitor.sh"<<std::endl;
+  }
   std::string inputRIDFFile("");
-  std::string inputconfigfile("config/config.json");
+  std::string inputconfigfile = std::string(home) + "/web/config/config.json";
 
   if (argc > 1) {
     std::string input1(argv[1]);
@@ -74,7 +77,7 @@ int main(int argc, char** argv) {
   const auto& config = cm->GetJson();
   if (config.contains("display") && config["display"].contains("mode"))
     mode = config["display"]["mode"];
-  std::cout<<"[main] mode:"<<mode<<std::endl;
+  std::cout<<"[OnlineMonitor] mode = "<<mode<<std::endl;
 
   DisplayOutput* displayOutput = nullptr;
   if (mode == "web" ){
@@ -83,7 +86,7 @@ int main(int argc, char** argv) {
     displayOutput = new CanvasOutput();// not yet implemented
     ((CanvasOutput*)displayOutput)->SetStopFlag(&gStopAnalysis);
   }else{
-    std::cerr << "[Main] unknown mode:" <<mode<< std::endl;
+    std::cerr << "[OnlineMonitor] unknown mode:" <<mode<< std::endl;
     return false;
   }
   
@@ -97,13 +100,14 @@ int main(int argc, char** argv) {
   // analysis
   AnalysisManager* analysisManager = new AnalysisManager(inputRIDFFile);
   if (!analysisManager->Initialize()) {
-    std::cerr << "[Main] Error: AnalysisManager initialization failed." << std::endl;
+    std::cerr << "[OnlineMonitor] Error: AnalysisManager initialization failed." << std::endl;
     return 1;
   }
   analysisManager->SetDisplayOutput(displayOutput);
   
   //---------------------------------------------
-  std::cout << "[Main] Start analysis loop. Press Ctrl+C to stop." << std::endl;
+  std::cout<<std::endl;
+  std::cout << "[OnlineMonitor] Start analysis loop. Press Ctrl+C to stop." << std::endl;
   while (!gStopAnalysis) {
 
     gSystem->ProcessEvents();
@@ -124,7 +128,7 @@ int main(int argc, char** argv) {
   }
 
   //---------------------------------------------
-  std::cout << "[Main] Cleaning up...  " << std::flush;
+  std::cout << "[OnlineMonitor] Cleaning up...  " << std::flush;
   delete analysisManager;
   delete displayOutput;
   std::cout << "Done" << std::endl;

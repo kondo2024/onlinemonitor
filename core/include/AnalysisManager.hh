@@ -13,15 +13,18 @@ class BaseAnalyzer;
 
 class AnalysisManager {
 public:
-  AnalysisManager(std::string ridffile);;
+  AnalysisManager(std::string ridffile);
   virtual ~AnalysisManager();
 
   bool Initialize();
   bool ProcessEvent();
   void SetDisplayOutput(DisplayOutput* output){
     fDispOutput = output;
-    fDispOutput->RegisterAnalysisStatus(&fAnalysisBusy);
+    fDispOutput->RegisterAnalysisStatus();
+    fDispOutput->RegisterEntries();
   }
+
+  Long64_t GetEntries(){return fEntries;}
   
 private:
   TArtEventStore* fEventStore;
@@ -31,7 +34,7 @@ private:
   std::vector<BaseAnalyzer*> fAnalyzers;
 
   Int_t fAnalysisBusy;// 1: analysis is busy
-  
+  Long64_t fEntries;
   bool fIsInitialized;
 };
 

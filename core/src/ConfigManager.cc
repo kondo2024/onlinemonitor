@@ -10,7 +10,7 @@ ConfigManager* ConfigManager::GetInstance() {
 bool ConfigManager::LoadConfig(const std::string& path) {
   std::ifstream ifs(path);
   if (!ifs.is_open()) {
-    std::cout<<"Cannot open file: " + path<<std::endl;
+    std::cout<<"Error: Cannot open file: " + path<<std::endl;
     return false;
   }
 
@@ -31,9 +31,11 @@ bool ConfigManager::LoadConfig(const std::string& path) {
     fConfig = std::move(mainJson);
 
   } catch (const std::exception& e) {
-    std::cout << "JSON Error: " << e.what() << std::endl;
+    std::cout << "Error: [ConfigManager] JSON Error: " << e.what() << std::endl;
     return false;
   }
+
+  std::cout<<"[ConfigManager] Loaded: "<<path<<std::endl;
   return true;
 
 }

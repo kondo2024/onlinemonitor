@@ -12,7 +12,8 @@ const state = {
         autoReset: false,
         autoResetEvents: 1000000,
         startTime: "", 
-        configPath: ""
+        configPath: "",
+	skipPaths: []
     },
     isRunning: false,
     currentPage: 0,
@@ -26,34 +27,57 @@ const state = {
 //---------------------------------------------------
 async function init() {
     try {
-        const [status, hierarchy] = await Promise.all([
-            httpRequest("/Status/ServerStartTime/root.json", "object"),
-            httpRequest("/h.json", "object")
-	    httpRequest("/config/config.json", "object")
-        ]);
-
+        const status = await httpRequest("/Status/ServerStartTime/root.json", "object");
         if (status) state.server.startTime = status.fTitle;
 
-	//const config = await httpRequest("config/config.json", "object");
-	
-        state.allPaths = [];
-        findHistograms(hierarchy);
-        
-        state.activePaths = [...state.allPaths];
-//	state.activePaths = state.allPaths.filter(path => 
-//            !state.defaultSkipPaths.includes(path)
-//        );
+        await syncServerState();
 
         setupEventListeners();
-        updateHistList();
         updateUIStates();
-
         await drawGrid();
-        console.log("Initialization done. Server Start Time:", state.server.startTime);
+        
+        console.log("Initialization done.");
     } catch (err) {
-        console.error("Initialization Failed:", err);
         showDisconnected(true);
     }
+    
+//    try {
+//        const [status, hierarchy, configContent] = await Promise.all([
+//            httpRequest("/Status/ServerStartTime/root.json", "object"),
+//            httpRequest("/h.json", "object"),
+//	    httpRequest("/Config/Contents/root.json", "object")
+//        ]);
+//
+//        if (status) state.server.startTime = status.fTitle;
+//
+//        if (configContent && configContent.fTitle) {
+//            try {
+//                const config = JSON.parse(configContent.fTitle);
+//                state.server.autoReset = config.auto_reset || false;
+//                state.server.autoResetEvents = config.auto_reset_events || 1000000;
+//                state.server.skipPaths = config.skip_histograms || [];
+//            } catch (e) {
+//                console.error("Failed to parse server config contents", e);
+//            }
+//        }
+//
+//        state.allPaths = [];
+//        findHistograms(hierarchy);
+//
+//        state.activePaths = state.allPaths.filter(path => 
+//            !state.server.skipPaths.includes(path)
+//        );
+//
+//        setupEventListeners();
+//        updateHistList();
+//        updateUIStates();
+//
+//        await drawGrid();
+//        console.log("Initialization done. Server Start Time:", state.server.startTime);
+//    } catch (err) {
+//        console.error("Initialization Failed:", err);
+//        showDisconnected(true);
+//    }
 }
 
 //---------------------------------------------------
@@ -108,13 +132,13 @@ function setupEventListeners() {
 //---------------------------------------------------
 async function drawGrid() {
 
-    const isBusy = await checkBusyStatus();
-    if (isBusy) {
-        console.log("Server is busy (Analysis in progress). Retrying in 100ms...");
-        setTimeout(() => drawGrid(), 100);
-        return;
+    let retryCount = 0;
+    while (await checkBusyStatus()) {
+        if (retryCount > 10) break;
+        await new Promise(r => setTimeout(r, 50));
+        retryCount++;
     }
-
+    
     await updateStatusInfo();
 
     const container = document.getElementById('grid-container');
@@ -169,41 +193,54 @@ async function updateStatusInfo() {
     const autoResetEl = document.getElementById('auto-reset-info');
 
     try {
-        const [timeRes, startRes, autoRes, entriesRes, limitRes, busyRes] = await Promise.all([
+        const [timeRes, startRes, configRes, entriesRes, busyRes] = await Promise.all([
             httpRequest("/Status/ServerTime/root.json", "object"),
             httpRequest("/Status/ServerStartTime/root.json", "object"),
-            httpRequest("/Config/AutoResetEnabled/root.json", "object"),
+            httpRequest("/Config/Contents/root.json", "object"),
             httpRequest("/Status/Entries/root.json", "object"),
-            httpRequest("/Config/AutoResetEvents/root.json", "object"),
             httpRequest("/Status/IsAnalysisBusy/root.json", "object")
         ]);
 
         if (timeRes) elTime.textContent = timeRes.fTitle;
 
-        if (startRes && state.server.startTime !== "" && startRes.fTitle !== state.server.startTime) {
-            console.log("Server restart detected. Re-initializing...");
-            location.reload(); 
-            return;
-        }
+        if (startRes && startRes.fTitle) {
+	    const currentServerStart = startRes.fTitle;
 
+	    if (state.server.startTime === "") {
+		state.server.startTime = currentServerStart;
+	    } 
+	    else if (currentServerStart !== state.server.startTime) {
+		console.warn("Server restart detected. Re-syncing...");
+		state.server.startTime = currentServerStart;
+
+		await syncServerState();
+
+		state.currentPage = 0;
+		await drawGrid();     
+		return;
+	    }
+        }
+	
+	if (configRes && configRes.fTitle) {
+            const config = JSON.parse(configRes.fTitle);
+            state.server.autoReset = config.auto_reset;
+            state.server.autoResetEvents = config.auto_reset_events;
+        }
+	
         if (busyRes && busyRes.fVal === 1) {
             elTime.textContent += " (BUSY)";
         }
 
-	if (autoRes && entriesRes && limitRes) {
+	if (entriesRes) {
             const currentEntries = entriesRes.fVal;
-            state.server.autoResetEvents = limitRes.fVal;
-
-//            if (currentEntries < state.lastEntries) {
-//                console.log("Server-side reset detected.");
-//            }
             state.lastEntries = currentEntries;
 
-
 	    if (autoResetEl) {
-		autoResetEl.innerText = (autoRes.fVal==1) ? 'Auto Reset ON' : 'Auto Reset OFF';
-                autoResetEl.innerText += `\nEntries: ${currentEntries}`;
-		if (autoRes.fVal==1) autoResetEl.innerText += " / " + state.autoResetEvents;
+		const statusStr = state.server.autoReset ? 'Auto Reset ON' : 'Auto Reset OFF';
+                autoResetEl.innerText = `${statusStr}\nEntries: ${currentEntries}`;
+                if (state.server.autoReset) {
+                    autoResetEl.innerText += " / " + state.server.autoResetEvents;
+                }
             }
         }
 
@@ -219,7 +256,44 @@ async function updateStatusInfo() {
         if ((Date.now() - state.lastSuccessTime) > 5000) showDisconnected(true);
     }
 }
+//---------------------------------------------------
+async function syncServerState() {
+    console.log("Syncing server state (Config and Histogram hierarchy)...");
+    
+    try {
+        const [configRes, hierarchy] = await Promise.all([
+            httpRequest("/Config/Contents/root.json", "object"),
+            httpRequest("/h.json", "object")
+        ]);
 
+        if (configRes && configRes.fTitle) {
+            try {
+                const config = JSON.parse(configRes.fTitle);
+                state.server.autoReset = config.auto_reset || false;
+                state.server.autoResetEvents = config.auto_reset_events || 1000000;
+                state.server.skipPaths = config.skip_histograms || [];
+            } catch (e) {
+                console.error("Failed to parse config JSON", e);
+            }
+        }
+
+        state.allPaths = [];
+        findHistograms(hierarchy);
+
+        state.activePaths = state.allPaths.filter(path => 
+            !state.server.skipPaths.includes(path)
+        );
+
+        updateHistList();
+        
+        return true;
+    } catch (err) {
+        console.error("Failed to sync server state:", err);
+        return false;
+    }
+}
+
+//---------------------------------------------------
 async function checkBusyStatus() {
     try {
         const res = await httpRequest("/Status/IsAnalysisBusy/root.json", "object");

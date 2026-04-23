@@ -9,7 +9,9 @@
     "display": {
 	"update_interval_ms": 8000,
 	"default_rows": 3,
-	"default_columns": 3
+	"default_columns": 3,
+	"canvas_width": 1200,
+	"canvas_height": 800
     },
     "http_port": 8080
 }

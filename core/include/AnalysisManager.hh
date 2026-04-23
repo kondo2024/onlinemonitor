@@ -20,8 +20,6 @@ public:
   bool ProcessEvent();
   void SetDisplayOutput(DisplayOutput* output){
     fDispOutput = output;
-    fDispOutput->SetAutoResetEnabled(fAutoResetEnabled);
-    fDispOutput->SetAutoResetEvents(fAutoResetEvents);
   }
 
 

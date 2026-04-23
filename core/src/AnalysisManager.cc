@@ -59,23 +59,25 @@ bool AnalysisManager::Initialize() {
 }
 
 bool AnalysisManager::ProcessEvent() {
-  const int anaPeriod = 500;//ms, should be moved somewhere
-  const int dispPeriod = 50;//ms
+  const int anaPeriod = 800;//ms, should be moved somewhere
+  const int dispPeriod = 200;//ms
 
+
+  fDispOutput->SetAnalysisBusyStatus(1);
+  
   // analysis is done during some period
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
 
-    fDispOutput->SetAnalysisBusyStatus(1);
     //if (!fEventStore->GetNextEvent()) return false;
     for (auto analyzer : fAnalyzers) {
       analyzer->Process();
     }
     fEntries++;
-    fDispOutput->SetAnalysisBusyStatus(0);
   }
 
+  fDispOutput->SetAnalysisBusyStatus(0);
   fDispOutput->SetEntries(fEntries);
   // accept http requests
   auto startHttp = std::chrono::steady_clock::now();

@@ -30,6 +30,9 @@ bool ConfigManager::LoadConfig(const std::string& path) {
     }
     
     fConfig = std::move(mainJson);
+    // for THttpServer
+    fConfigContents.SetName("Contents");
+    fConfigContents.SetTitle(fConfig.dump().c_str());
 
   } catch (const std::exception& e) {
     std::cout << "Error: [ConfigManager] JSON Error: " << e.what() << std::endl;

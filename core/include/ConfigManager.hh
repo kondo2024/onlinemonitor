@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <TNamed.h>
 
 class ConfigManager {
 public:
@@ -24,11 +25,14 @@ public:
   }
 
   const std::string GetConfigPath(){return fFilename;}
+
+  TNamed* GetConfigContentsPtr(){return &fConfigContents;}
   
 private:
   ConfigManager() = default;
   std::string fFilename;
   nlohmann::json fConfig;
+  TNamed fConfigContents;
   //std::string fLastError;
   bool fIsLoaded = false;
 };

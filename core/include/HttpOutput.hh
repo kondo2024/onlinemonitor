@@ -2,7 +2,6 @@
 #define HttpOutput_hh
 
 #include "DisplayOutput.hh"
-#include <TDatime.h>
 
 class THttpServer;
 class TNamed;
@@ -16,8 +15,6 @@ public:
   void Update() override;
   void RegisterAnalysisBusyStatus() override;
   void RegisterEntries() override;
-  void RegisterAutoResetEnabled() override;
-  void RegisterAutoResetEvents() override;
 
   void RegisterParameters();
   
@@ -28,7 +25,6 @@ private:
   THttpServer* fHttpServer;
   TNamed* fServerTimeStr;
   TDatime fServerStartTime;
-  TDatime fDatime;
 };
 
 #endif

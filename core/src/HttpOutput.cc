@@ -24,11 +24,12 @@ bool HttpOutput::Initialize() {
 
   ConfigManager* cm = ConfigManager::GetInstance();
   const auto& config = cm->GetJson();
-  int port = 8080;
-  if (config.contains("http_port"))
-    port = config["http_port"];
-  std::cout<<"[HttpOutput] port = "<<port<<std::endl;
 
+  // port
+  int port = 8080;
+  if (config.contains("http_port")) port = config["http_port"];
+
+  // http root
   const char* home = std::getenv("ONLINEMONITOR_HOME");
   std::string http_root = std::string(home) + "/web/";
   std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
@@ -51,16 +52,10 @@ bool HttpOutput::Initialize() {
   fServerTimeStr = new TNamed("ServerTime", "Starting ...");
   fHttpServer->Register("/Status", fServerTimeStr);
 
-
   RegisterAnalysisBusyStatus();
   RegisterEntries();
-  RegisterAutoResetEnabled();    
-  RegisterAutoResetEvents();    
 
-  std::string json_str = cm->GetJson().dump();
-  //fHttpServer->Register("/Config",json_str.c_str());
-  
-  fHttpServer->Register("/Config", new TNamed("ConfigPath", cm->GetConfigPath().c_str()));
+  fHttpServer->Register("/Config", cm->GetConfigContentsPtr());
 
   fServerStartTime.Set();
   fHttpServer->Register("/Status", new TNamed("ServerStartTime",fServerStartTime.AsSQLString()));
@@ -83,22 +78,6 @@ void HttpOutput::RegisterEntries() {
   fHttpServer->Register("/Status", fEntriesPrm);
 
   std::cout<<"[HttpOutput] RegisterEntries"<<std::endl;  
-}
-
-void HttpOutput::RegisterAutoResetEnabled() {
-  if (!fHttpServer) return;
-  fAutoResetEnabledPrm = new TParameter<Int_t>("AutoResetEnabled", fAutoResetEnabled);
-  fHttpServer->Register("/Config", fAutoResetEnabledPrm);
-
-  std::cout<<"[HttpOutput] RegisterAutoResetEnabled"<<std::endl;  
-}
-
-void HttpOutput::RegisterAutoResetEvents() {
-  if (!fHttpServer) return;
-  fAutoResetEventsPrm = new TParameter<Long64_t>("AutoResetEvents", fAutoResetEvents);
-  fHttpServer->Register("/Config", fAutoResetEventsPrm);
-
-  std::cout<<"[HttpOutput] RegisterAutoResetEvents"<<std::endl;  
 }
 
 void HttpOutput::Update() {

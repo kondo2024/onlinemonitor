@@ -41,14 +41,23 @@ bool CanvasOutput::Initialize() {
 
   if (config.contains("skip_histograms")) {
     fSkipPaths = config["skip_histograms"].get<std::vector<std::string>>();
+    if (fSkipPaths.size()>0){
+      std::cout<<"Skip drawing histograms: "<<std::flush;
+      for (const auto& s : fSkipPaths) {
+	std::cout<<s<<" "<<std::flush;
+      }
+      std::cout<<std::endl;
+    }
   }
-    
-  fCanvas = new TCanvas("c1", "Online Monitor (Canvas Mode)", 800, 600);
+
+  int width  = config["display"].value("canvas_width", 800);
+  int height = config["display"].value("canvas_height", 600);
+  
+  fCanvas = new TCanvas("c1", "Online Monitor (Canvas Mode)", width, height);
   fCanvas->Divide(fCols, fRows);
 
   RegisterAnalysisBusyStatus();
   RegisterEntries();
-  RegisterAutoResetEvents();    
   
   fTimer.Start();
 
@@ -67,6 +76,11 @@ void CanvasOutput::Update() {
     fCanvas->Clear();
     fCanvas->Divide(fCols, fRows);
 
+
+    fDatime.Set();
+    TString str = "Online Monitor (Canvas Mode) ";
+    fCanvas->SetTitle(str + fDatime.AsSQLString());
+    
     Draw();
 
     //std::cout<<"[CanvasOutput] event = "<<GetEntries()<<std::endl;

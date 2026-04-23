@@ -10,7 +10,6 @@ onlinemonitor xxxx.ridf [config.json]
 - sm_online_utils
   - include new onlinemonitor
   - change directory of converters
-- auto reset in CavasOutput
 - core, analyzer -> source/core,analyzer
 - config/config.json -> config/s074/config.json (ln -sf)
 - PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer, BeamFocusAnalyzer

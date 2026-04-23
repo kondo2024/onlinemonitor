@@ -14,15 +14,20 @@ public:
 
   bool Initialize() override;
   void Update() override;
-  void RegisterAnalysisStatus() override;
+  void RegisterAnalysisBusyStatus() override;
   void RegisterEntries() override;
+  void RegisterAutoResetEnabled() override;
+  void RegisterAutoResetEvents() override;
 
+  void RegisterParameters();
+  
 private:
   void SetupHttpCommands();
   void RefreshServerTime();
 
   THttpServer* fHttpServer;
   TNamed* fServerTimeStr;
+  TDatime fServerStartTime;
   TDatime fDatime;
 };
 

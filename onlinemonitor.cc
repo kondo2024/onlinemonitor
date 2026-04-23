@@ -70,8 +70,6 @@ int main(int argc, char** argv) {
   auto cm = ConfigManager::GetInstance();
   cm->LoadConfig(inputconfigfile);
 
-  HistogramManager* histManager = HistogramManager::GetInstance();
-
   //---------------------------------------------
   // display
   const auto& config = cm->GetJson();

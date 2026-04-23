@@ -42,23 +42,26 @@ bool CanvasOutput::Initialize() {
   if (config.contains("skip_histograms")) {
     fSkipPaths = config["skip_histograms"].get<std::vector<std::string>>();
   }
-
     
   fCanvas = new TCanvas("c1", "Online Monitor (Canvas Mode)", 800, 600);
   fCanvas->Divide(fCols, fRows);
 
+  RegisterAnalysisBusyStatus();
+  RegisterEntries();
+  RegisterAutoResetEvents();    
+  
   fTimer.Start();
 
   return true;
 }
 
-void CanvasOutput::RegisterAnalysisStatus() {
-  fIsAnalysisBusyPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusy);
+void CanvasOutput::RegisterAnalysisBusyStatus() {
+  fIsAnalysisBusyStatusPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusyStatus);
 }
 
 void CanvasOutput::Update() {
   if (!fCanvas) return;
-  
+
   if (fCurrentPage == -1 || fTimer.RealTime() * 1000.0 > fIntervalMs) {
     fTimer.Start();
     fCanvas->Clear();
@@ -66,6 +69,8 @@ void CanvasOutput::Update() {
 
     Draw();
 
+    //std::cout<<"[CanvasOutput] event = "<<GetEntries()<<std::endl;
+    
   } else {
     fTimer.Continue();
   }

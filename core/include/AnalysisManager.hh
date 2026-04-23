@@ -20,11 +20,19 @@ public:
   bool ProcessEvent();
   void SetDisplayOutput(DisplayOutput* output){
     fDispOutput = output;
-    fDispOutput->RegisterAnalysisStatus();
-    fDispOutput->RegisterEntries();
+    fDispOutput->SetAutoResetEnabled(fAutoResetEnabled);
+    fDispOutput->SetAutoResetEvents(fAutoResetEvents);
   }
 
-  Long64_t GetEntries(){return fEntries;}
+
+  Int_t  GetAnalysisBusyStatus(){return     fAnalysisBusyStatus;}
+  Int_t* GetAnalysisBusyStatusPtr(){return &fAnalysisBusyStatus;}
+  Int_t  GetAutoResetEnabled(){return     fAutoResetEnabled;}
+  Int_t* GetAutoResetEnabledPtr(){return &fAutoResetEnabled;}
+  Long64_t  GetEntries(){return     fEntries;}
+  Long64_t* GetEntriesPtr(){return &fEntries;}
+  Long64_t  GetAutoResetEvents(){return     fAutoResetEvents;}
+  Long64_t* GetAutoResetEventsPtr(){return &fAutoResetEvents;}
   
 private:
   TArtEventStore* fEventStore;
@@ -33,8 +41,12 @@ private:
 
   std::vector<BaseAnalyzer*> fAnalyzers;
 
-  Int_t fAnalysisBusy;// 1: analysis is busy
+  // for THttpServer
+  Int_t fAnalysisBusyStatus;// 1: analysis is busy
+  Int_t fAutoResetEnabled;
   Long64_t fEntries;
+  Long64_t fAutoResetEvents;
+
   bool fIsInitialized;
 };
 

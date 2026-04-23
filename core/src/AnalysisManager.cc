@@ -16,7 +16,8 @@ using json = nlohmann::json;
 
 
 AnalysisManager::AnalysisManager(std::string ridffile) 
-  : fEventStore(nullptr), fAnalysisBusy(1), fEntries(0)
+  : fEventStore(nullptr), fAnalysisBusyStatus(1), fAutoResetEnabled(1),
+    fEntries(0), fAutoResetEvents(1000000)
 {}
 
 AnalysisManager::~AnalysisManager() {
@@ -30,6 +31,7 @@ AnalysisManager::~AnalysisManager() {
 
 bool AnalysisManager::Initialize() {
 
+  // definition of analyzers
   auto config = ConfigManager::GetInstance()->GetJson();
   std::vector<std::string> analyzerList = config["analyzers"];
   for (const auto& name : analyzerList) {
@@ -43,6 +45,10 @@ bool AnalysisManager::Initialize() {
     analyzer->Init();
   }
 
+  // parameters
+  fAutoResetEnabled = config["auto_reset"];
+  fAutoResetEvents = config["auto_reset_events"];
+  
   fEventStore = new TArtEventStore();
   if (!fEventStore->Open()) {
     std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
@@ -61,32 +67,35 @@ bool AnalysisManager::ProcessEvent() {
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
 
-    fDispOutput->SetAnalysisStatus(1);
+    fDispOutput->SetAnalysisBusyStatus(1);
     //if (!fEventStore->GetNextEvent()) return false;
     for (auto analyzer : fAnalyzers) {
       analyzer->Process();
     }
     fEntries++;
-    //std::cout<<fDispOutput->GetEntries()<<std::endl;
+    fDispOutput->SetAnalysisBusyStatus(0);
   }
-  fDispOutput->SetAnalysisStatus(0);
-  fDispOutput->SetEntries(fEntries);
 
+  fDispOutput->SetEntries(fEntries);
   // accept http requests
   auto startHttp = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
     //    gSystem->ProcessEvents();// called in DisplayOutput
-
     fDispOutput->Update();
     gSystem->Sleep(1);
   }
 
+  if (fAutoResetEnabled){
+    if (fEntries > fAutoResetEvents){
+      HistogramManager::GetInstance()->RequestResetAll();
+    }
+  }
   
   if (HistogramManager::GetInstance()->IsResetAllRequested()){
     HistogramManager::GetInstance()->ResetAll();
     HistogramManager::GetInstance()->ClearResetAllRequest();
     fEntries = 0;
-    fDispOutput->SetEntries(fEntries);    
+    fDispOutput->SetEntries(fEntries);
   }
   
   return true;

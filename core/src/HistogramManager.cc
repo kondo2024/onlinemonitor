@@ -101,13 +101,12 @@ TH2* HistogramManager::GetTH2(const std::string& name) {
 
 void HistogramManager::RequestResetAll() {
   fResetAllRequested = true;
-  std::cout << "[HistogramManager] ResetAll requested via HTTP." << std::endl;
 }
 
 void HistogramManager::ResetAll() {
-  std::cout << "[HistogramManager] Resetting all histograms..." << std::endl;
+  //std::cout << "[HistogramManager] Resetting all histograms..." << std::endl;
   auto config = ConfigManager::GetInstance();
-  config->LoadConfig("config/config.json");
+  config->ReloadConfig();
 
   for (auto& h : fHistograms) {
     TH2* h2 = dynamic_cast<TH2*>(h);
@@ -115,6 +114,7 @@ void HistogramManager::ResetAll() {
     else    ChangeRangeTH1(h);
     h->Reset("ICES");
   }
+  fResetAllRequested = false;
 }
 
 std::vector<std::string> HistogramManager::GetAllNames() {

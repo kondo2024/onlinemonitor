@@ -22,7 +22,8 @@ HttpOutput::~HttpOutput() {
 bool HttpOutput::Initialize() {
 
 
-  const auto& config = ConfigManager::GetInstance()->GetJson();
+  ConfigManager* cm = ConfigManager::GetInstance();
+  const auto& config = cm->GetJson();
   int port = 8080;
   if (config.contains("http_port"))
     port = config["http_port"];
@@ -50,15 +51,29 @@ bool HttpOutput::Initialize() {
   fServerTimeStr = new TNamed("ServerTime", "Starting ...");
   fHttpServer->Register("/Status", fServerTimeStr);
 
+
+  RegisterAnalysisBusyStatus();
+  RegisterEntries();
+  RegisterAutoResetEnabled();    
+  RegisterAutoResetEvents();    
+
+  std::string json_str = cm->GetJson().dump();
+  //fHttpServer->Register("/Config",json_str.c_str());
+  
+  fHttpServer->Register("/Config", new TNamed("ConfigPath", cm->GetConfigPath().c_str()));
+
+  fServerStartTime.Set();
+  fHttpServer->Register("/Status", new TNamed("ServerStartTime",fServerStartTime.AsSQLString()));
+  
   std::cout << "[HttpOutput] Web Server initialized, visit http://localhost:"<<port<<"/web/index.html" << std::endl;
   return true;
 }
 
-void HttpOutput::RegisterAnalysisStatus() {
+void HttpOutput::RegisterAnalysisBusyStatus() {
   if (!fHttpServer) return;
 
-  fIsAnalysisBusyPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusy);
-  fHttpServer->Register("/Status", fIsAnalysisBusyPrm);
+  fIsAnalysisBusyStatusPrm = new TParameter<Int_t>("IsAnalysisBusy", fIsAnalysisBusyStatus);
+  fHttpServer->Register("/Status", fIsAnalysisBusyStatusPrm);
 }
 
 void HttpOutput::RegisterEntries() {
@@ -67,7 +82,23 @@ void HttpOutput::RegisterEntries() {
   fEntriesPrm = new TParameter<Long64_t>("Entries", fEntries);
   fHttpServer->Register("/Status", fEntriesPrm);
 
-  std::cout<<"HttpOutput: RegisterEntries"<<std::endl;  
+  std::cout<<"[HttpOutput] RegisterEntries"<<std::endl;  
+}
+
+void HttpOutput::RegisterAutoResetEnabled() {
+  if (!fHttpServer) return;
+  fAutoResetEnabledPrm = new TParameter<Int_t>("AutoResetEnabled", fAutoResetEnabled);
+  fHttpServer->Register("/Config", fAutoResetEnabledPrm);
+
+  std::cout<<"[HttpOutput] RegisterAutoResetEnabled"<<std::endl;  
+}
+
+void HttpOutput::RegisterAutoResetEvents() {
+  if (!fHttpServer) return;
+  fAutoResetEventsPrm = new TParameter<Long64_t>("AutoResetEvents", fAutoResetEvents);
+  fHttpServer->Register("/Config", fAutoResetEventsPrm);
+
+  std::cout<<"[HttpOutput] RegisterAutoResetEvents"<<std::endl;  
 }
 
 void HttpOutput::Update() {

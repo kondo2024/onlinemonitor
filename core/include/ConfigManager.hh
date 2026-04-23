@@ -12,8 +12,8 @@ public:
   bool LoadConfig(const std::string& path);
   bool ReloadConfig(){return LoadConfig(fFilename.c_str());}
 
-  bool HasError() const { return !fLastError.empty(); }
-  std::string GetLastError() const { return fLastError; }
+//  bool HasError() const { return !fLastError.empty(); }
+//  std::string GetLastError() const { return fLastError; }
 
   const nlohmann::json& GetJson() const { return fConfig; }
 
@@ -23,11 +23,14 @@ public:
     return fConfig.contains(key) && fConfig[key].contains(subkey);
   }
 
+  const std::string GetConfigPath(){return fFilename;}
+  
 private:
   ConfigManager() = default;
   std::string fFilename;
   nlohmann::json fConfig;
-  std::string fLastError;
+  //std::string fLastError;
+  bool fIsLoaded = false;
 };
 
 #endif

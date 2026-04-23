@@ -14,7 +14,7 @@ public:
 
   bool Initialize() override;
   void Update() override;
-  void RegisterAnalysisStatus() override;
+  void RegisterAnalysisBusyStatus() override;
 
   void Draw();
 

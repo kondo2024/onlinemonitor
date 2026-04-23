@@ -2,7 +2,8 @@
 #include <fstream>
 #include <iostream>
 
-ConfigManager* ConfigManager::GetInstance() {
+ConfigManager* ConfigManager::GetInstance()
+{
   static ConfigManager instance;
   return &instance;
 }
@@ -35,7 +36,9 @@ bool ConfigManager::LoadConfig(const std::string& path) {
     return false;
   }
 
-  std::cout<<"[ConfigManager] Loaded: "<<path<<std::endl;
+  fFilename = path;
+  if (!fIsLoaded) std::cout<<"[ConfigManager] Loaded: "<<fFilename<<std::endl;
+  fIsLoaded = true;
   return true;
 
 }

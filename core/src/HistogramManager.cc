@@ -30,6 +30,7 @@ TH1* HistogramManager::BookTH1(const std::string& name, const std::string& title
   fHistogramsMap[name] = h;
   fHistograms.push_back(h);
 
+  //SetDirectory(h, folder);
   ChangeRangeTH1(h);
 
   return h;
@@ -51,6 +52,7 @@ TH1* HistogramManager::BookTH2(const std::string& name, const std::string& title
   fHistogramsMap[name] = h;
   fHistograms.push_back(h);
 
+  //SetDirectory(h, folder);
   ChangeRangeTH2(h);
   
   return h;
@@ -62,7 +64,11 @@ void HistogramManager::ChangeRangeTH1(TH1* h) {
   const auto& config = ConfigManager::GetInstance()->GetJson();
   if (config.contains("ranges") && config["ranges"].contains(name)) {
     auto& r = config["ranges"][name];
-    h->SetBins(r["xbins"], r["xmin"], r["xmax"]);
+
+    int bins = r.value("xbins", h->GetNbinsX());
+    double min = r.value("xmin", h->GetXaxis()->GetXmin());
+    double max = r.value("xmax", h->GetXaxis()->GetXmax());
+    h->SetBins(bins, min, max);
     h->Reset("ICES");
     std::cout << "[HistogramManager] Updated TH1 bin/range for: " << name << std::endl;
   }
@@ -79,8 +85,15 @@ void HistogramManager::ChangeRangeTH2(TH1* h){
     auto& r = config["ranges"][name];
   
     if (h2 && r.contains("ybins")) {
-      h2->SetBins(r["xbins"], r["xmin"], r["xmax"], 
-		  r["ybins"], r["ymin"], r["ymax"]);
+      int   xbins = r.value("xbins", h2->GetNbinsX());
+      double xmin = r.value("xmin",  h2->GetXaxis()->GetXmin());
+      double xmax = r.value("xmax",  h2->GetXaxis()->GetXmax());
+      int   ybins = r.value("ybins", h2->GetNbinsY());
+      double ymin = r.value("ymin",  h2->GetYaxis()->GetXmin());
+      double ymax = r.value("ymax",  h2->GetYaxis()->GetXmax());
+      //h->SetBins(bins, min, max);
+      
+      h2->SetBins(xbins, xmin, xmax, ybins, ymin, ymax);
       h2->Reset("ICES");
       std::cout << "[HistogramManager] Updated TH2 bins/ranges for: " << name << std::endl;
     }
@@ -99,14 +112,20 @@ TH2* HistogramManager::GetTH2(const std::string& name) {
 }
 
 
+void HistogramManager::SetDirectory(TH1* h, const std::string& folder) {
+  if (!h) return;
+  TDirectory* dir = gROOT->GetDirectory(folder.c_str());
+  if (!dir) dir = gROOT->mkdir(folder.c_str());
+  h->SetDirectory(dir);
+}
+
 void HistogramManager::RequestResetAll() {
   fResetAllRequested = true;
 }
 
 void HistogramManager::ResetAll() {
   //std::cout << "[HistogramManager] Resetting all histograms..." << std::endl;
-  auto config = ConfigManager::GetInstance();
-  config->ReloadConfig();
+  ConfigManager::GetInstance()->ReloadConfig();
 
   for (auto& h : fHistograms) {
     TH2* h2 = dynamic_cast<TH2*>(h);

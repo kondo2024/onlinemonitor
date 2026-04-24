@@ -16,8 +16,9 @@ using json = nlohmann::json;
 
 
 AnalysisManager::AnalysisManager(std::string ridffile) 
-  : fEventStore(nullptr), fAnalysisBusyStatus(1), fAutoResetEnabled(1),
-    fEntries(0), fAutoResetEvents(1000000)
+  : fRIDFFile(ridffile), fEventStore(nullptr), fDispOutput(nullptr),
+    fAnalysisBusyStatus(1), fAutoResetEnabled(1), fEntries(0),
+    fAutoResetEvents(1000000), fIsInitialized(false)
 {}
 
 AnalysisManager::~AnalysisManager() {
@@ -33,12 +34,19 @@ bool AnalysisManager::Initialize() {
 
   // definition of analyzers
   auto config = ConfigManager::GetInstance()->GetJson();
-  std::vector<std::string> analyzerList = config["analyzers"];
-  for (const auto& name : analyzerList) {
-    if (name == "Test") {
-      fAnalyzers.push_back(new TestAnalyzer());
-      std::cout << "[AnalysisManager] Analyzer registered: " << name << std::endl;
+
+
+  if (config.contains("analyzers")){
+    std::vector<std::string> analyzerList = config["analyzers"];
+    for (const auto& name : analyzerList) {
+      if (name == "Test") {
+	fAnalyzers.push_back(new TestAnalyzer());
+	std::cout << "[AnalysisManager] Analyzer registered: " << name << std::endl;
+      }
     }
+  }else{
+    std::cout<<"[AnalysisManager] Error: no analyzer is defined in config.json"<<std::endl;
+    return false;
   }
 
   for (auto analyzer : fAnalyzers) {
@@ -46,14 +54,16 @@ bool AnalysisManager::Initialize() {
   }
 
   // parameters
-  fAutoResetEnabled = config["auto_reset"];
-  fAutoResetEvents = config["auto_reset_events"];
+  fAutoResetEnabled = config.value("auto_reset",1);
+  fAutoResetEvents = config.value("auto_reset_events",1000000);
   
   fEventStore = new TArtEventStore();
-  if (!fEventStore->Open()) {
-    std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
-    return false;
-  }
+//  if (fRIDFFile=="online"){
+//    fEventStore->Open(0);
+//  }else if (!fEventStore->Open(fRIDFFile.c_str())) {
+//    std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
+//    return false;
+//  }
 
   return true;
 }
@@ -70,7 +80,9 @@ bool AnalysisManager::ProcessEvent() {
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
 
+    // temptemptemp
     //if (!fEventStore->GetNextEvent()) return false;
+
     for (auto analyzer : fAnalyzers) {
       analyzer->Process();
     }
@@ -87,10 +99,8 @@ bool AnalysisManager::ProcessEvent() {
     gSystem->Sleep(1);
   }
 
-  if (fAutoResetEnabled){
-    if (fEntries > fAutoResetEvents){
-      HistogramManager::GetInstance()->RequestResetAll();
-    }
+  if (fAutoResetEnabled && fEntries > fAutoResetEvents){
+    HistogramManager::GetInstance()->RequestResetAll();
   }
   
   if (HistogramManager::GetInstance()->IsResetAllRequested()){

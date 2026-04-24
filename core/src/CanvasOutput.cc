@@ -54,7 +54,6 @@ bool CanvasOutput::Initialize() {
   int height = config["display"].value("canvas_height", 600);
   
   fCanvas = new TCanvas("c1", "Online Monitor (Canvas Mode)", width, height);
-  fCanvas->Divide(fCols, fRows);
 
   RegisterAnalysisBusyStatus();
   RegisterEntries();
@@ -73,8 +72,6 @@ void CanvasOutput::Update() {
 
   if (fCurrentPage == -1 || fTimer.RealTime() * 1000.0 > fIntervalMs) {
     fTimer.Start();
-    fCanvas->Clear();
-    fCanvas->Divide(fCols, fRows);
 
 
     fDatime.Set();
@@ -95,6 +92,8 @@ void CanvasOutput::Update() {
 
 void CanvasOutput::Draw() {
   fCanvas->SetBatch(kTRUE);
+  fCanvas->Clear();
+  fCanvas->Divide(fCols, fRows);
 
   std::vector<std::string> allPaths = HistogramManager::GetInstance()->GetAllNames();
   std::vector<std::string> activePaths;
@@ -120,11 +119,7 @@ void CanvasOutput::Draw() {
 
     if (pathIdx < (int)activePaths.size()) {
       TH1* h = HistogramManager::GetInstance()->GetTH1(activePaths[pathIdx]);
-      if (h) {
-	h->Draw("colz");
-      }
-    } else {
-      gPad->Clear();
+      if (h) h->Draw("colz");
     }
   }
 
@@ -191,12 +186,9 @@ int CanvasOutput::ExecuteKeyCommand() {
       } else if (input == 'r') {
 	HistogramManager::GetInstance()->ResetAll();
 	Draw();
-	fCanvas->Modified();
-	fCanvas->Update();
       }
-
     }
-    usleep(10000);
+    gSystem->Sleep(10);
   }
   SetTerminalRawMode(false);
   return -1;

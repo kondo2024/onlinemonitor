@@ -11,29 +11,25 @@ public:
   static ConfigManager* GetInstance();
 
   bool LoadConfig(const std::string& path);
-  bool ReloadConfig(){return LoadConfig(fFilename.c_str());}
-
-//  bool HasError() const { return !fLastError.empty(); }
-//  std::string GetLastError() const { return fLastError; }
+  bool ReloadConfig(){return LoadConfig(fFilename);}
 
   const nlohmann::json& GetJson() const { return fConfig; }
 
   // check if key exists
   bool Contains(const std::string& key, const std::string& subkey = "") const {
     if (subkey.empty()) return fConfig.contains(key);
-    return fConfig.contains(key) && fConfig[key].contains(subkey);
+    return fConfig.contains(key) && fConfig[key].is_object() && fConfig[key].contains(subkey);
   }
 
-  const std::string GetConfigPath(){return fFilename;}
+  const std::string& GetConfigPath(){return fFilename;}
 
   TNamed* GetConfigContentsPtr(){return &fConfigContents;}
   
 private:
-  ConfigManager() = default;
+  ConfigManager();
   std::string fFilename;
   nlohmann::json fConfig;
-  TNamed fConfigContents;
-  //std::string fLastError;
+  TNamed fConfigContents{"Contents", ""};
   bool fIsLoaded = false;
 };
 

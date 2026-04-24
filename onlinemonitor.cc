@@ -14,11 +14,11 @@
 #include <termios.h>
 #include <unistd.h>
 
-bool gStopAnalysis = false;
+volatile sig_atomic_t gStopAnalysis = false;
 
 void handle_signal(int sig) {
   std::cout << "\n[OnlineMonitor] Signal (" << sig << ") received. Stopping analysis..." << std::endl;
-  gStopAnalysis = true;
+  gStopAnalysis = 1;
 
 }
 
@@ -27,9 +27,11 @@ int main(int argc, char** argv) {
   const char* home = std::getenv("ONLINEMONITOR_HOME");
   if (!home){
     std::cerr<<"[OnlineMonitor] ONLINEMONITOR_HOME not set, run setup_onlinemonitor.sh"<<std::endl;
+    return 1;
   }
-  std::string inputRIDFFile("");
-  std::string inputconfigfile = std::string(home) + "/web/config/config.json";
+  //std::string inputRIDFFile("online");
+  std::string inputRIDFFile("aaa");
+  std::string inputconfigfile = std::string(home) + "/config/config.json";
 
   if (argc > 1) {
     std::string input1(argv[1]);
@@ -82,7 +84,7 @@ int main(int argc, char** argv) {
     displayOutput = new HttpOutput();
   }else if  (mode == "canvas" ){
     displayOutput = new CanvasOutput();// not yet implemented
-    ((CanvasOutput*)displayOutput)->SetStopFlag(&gStopAnalysis);
+    static_cast<CanvasOutput*>(displayOutput)->SetStopFlag((bool*)&gStopAnalysis);
   }else{
     std::cerr << "[OnlineMonitor] unknown mode:" <<mode<< std::endl;
     return false;
@@ -99,26 +101,25 @@ int main(int argc, char** argv) {
   AnalysisManager* analysisManager = new AnalysisManager(inputRIDFFile);
   if (!analysisManager->Initialize()) {
     std::cerr << "[OnlineMonitor] Error: AnalysisManager initialization failed." << std::endl;
-    return 1;
+    // temptemptemp
+    //delete displayOutput;
+    //return 1;
+    // temptemptemp
   }
   analysisManager->SetDisplayOutput(displayOutput);
   
   //---------------------------------------------
+  // main loop
   std::cout<<std::endl;
   std::cout << "[OnlineMonitor] Start analysis loop. Press Ctrl+C to stop." << std::endl;
   while (!gStopAnalysis) {
-
     gSystem->ProcessEvents();
-    if (gStopAnalysis) break;
-
-    
 
     if (displayOutput->IsKeyPressed()) {
       int ret = displayOutput->ExecuteKeyCommand();
       if (ret == -1) break;
     }
     
-
     if (!analysisManager->ProcessEvent()) {
       gSystem->Sleep(100); 
     }

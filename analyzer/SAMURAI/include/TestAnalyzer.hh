@@ -17,11 +17,11 @@ public:
     for (int i=0;i<10;++i){
       hTest[i] = hm->BookTH1(Form("hTest%d",i),
 			    Form("Test Histogram %d;Value;Counts",i),
-			    100, 0, 100, "TestFolder");
+			    100, 0, 100, "Test");
       hTest[i]->SetMinimum(0);
     }
     hTest[10] = hm->BookTH2("hTest10","Test 2D Histogram;xval;yval",
-			   100,0,100,50,0,200,"TestFolder");
+			   100,0,100,50,0,200,"Test");
     return true;
   }
 

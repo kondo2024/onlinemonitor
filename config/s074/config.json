@@ -4,7 +4,7 @@
     "skip_histograms":[
 	"hTest1"
     ],
-    "auto_reset": false,
+    "auto_reset": true,
     "auto_reset_events": 1000000,
     "display": {
 	"update_interval_ms": 8000,

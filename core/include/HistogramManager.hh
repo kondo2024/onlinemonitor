@@ -18,12 +18,10 @@ public:
   HistogramManager(const HistogramManager&) = delete;
   HistogramManager& operator=(const HistogramManager&) = delete;
 
-  TH1* BookTH1(const std::string& name,
-	      const std::string& title,
-	      int bins, double min, double max,
-	      const std::string& folder = "Detectors");
-  TH1* BookTH2(const std::string& name,
-	       const std::string& title,
+  TH1* BookTH1(const std::string& name, const std::string& title,
+	       int bins, double min, double max,
+	       const std::string& folder = "Detectors");
+  TH1* BookTH2(const std::string& name, const std::string& title,
 	       int xbins, double xmin, double xmax,
 	       int ybins, double ymin, double ymax,
 	       const std::string& folder = "Detectors");
@@ -52,6 +50,8 @@ private:
   bool fResetAllRequested;
   std::map<std::string, TH1*> fHistogramsMap;
   std::vector<TH1*> fHistograms;
+
+  void SetDirectory(TH1* h, const std::string& folder);
 };
 
 #endif

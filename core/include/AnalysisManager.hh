@@ -33,6 +33,7 @@ public:
   Long64_t* GetAutoResetEventsPtr(){return &fAutoResetEvents;}
   
 private:
+  std::string fRIDFFile;
   TArtEventStore* fEventStore;
 
   DisplayOutput* fDispOutput;

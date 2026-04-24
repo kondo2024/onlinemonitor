@@ -26,11 +26,15 @@ bool HttpOutput::Initialize() {
   const auto& config = cm->GetJson();
 
   // port
-  int port = 8080;
-  if (config.contains("http_port")) port = config["http_port"];
+  int port = config.value("http_port", 8080);
 
   // http root
   const char* home = std::getenv("ONLINEMONITOR_HOME");
+  if (!home) {
+    std::cerr << "[HttpOutput] CRITICAL: ONLINEMONITOR_HOME not set." << std::endl;
+    return false;
+  }
+  
   std::string http_root = std::string(home) + "/web/";
   std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
@@ -44,7 +48,7 @@ bool HttpOutput::Initialize() {
   if (!fHttpServer) return false;  
 
   fHttpServer->AddLocation("web/", http_root.c_str()); 
-  fHttpServer->SetDefaultPage("index.html");
+  //fHttpServer->SetDefaultPage("web/index.html");
   fHttpServer->SetReadOnly(kFALSE);
 
   SetupHttpCommands();
@@ -76,8 +80,6 @@ void HttpOutput::RegisterEntries() {
 
   fEntriesPrm = new TParameter<Long64_t>("Entries", fEntries);
   fHttpServer->Register("/Status", fEntriesPrm);
-
-  std::cout<<"[HttpOutput] RegisterEntries"<<std::endl;  
 }
 
 void HttpOutput::Update() {

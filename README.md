@@ -25,14 +25,25 @@ cmake -DCMAKE_INSTALL_PREFIX=../install ../
 
 
 ## Quick Usage
-   source install/bin/setup_onlinemonitor.sh
-   online_monitor (online mode, )
-   online_monitor online [config.json] (online, canvas mode)
-   online_monitor ridffile [config.json] (offline, canvas mode)
+```
+source install/bin/setup_onlinemonitor.sh
+```
+### online mode, access to http://server:8080/web/index.html
 Access the monitoring dashboard via your browser:
-* Main UI: http://localhost:8080/web/index.html
- * simple UI is also available at: http://localhost:8080
-* Local Controls: click Canvas and press a key, then keyboard control is active
+* Main UI: http://server:8080/web/index.html
+* simple UI is also available at: http://server:8080
+```
+online_monitor
+```
+### load specific configuration json file
+```
+online_monitor online [config.json] (online, canvas mode)
+```
+### offline mode, histograms are drawn in TCanvas
+Click Canvas, then keyboard control will be available.
+```
+online_monitor ridffile [config.json] (offline, canvas mode)
+```
 
 ## Config (config.json)
 | Key | Description |

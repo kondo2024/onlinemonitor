@@ -43,9 +43,3 @@ Access the monitoring dashboard via your browser:
 - jsroot -> submodule
 - core, analyzer -> source/core,analyzer
 - PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer, BeamFocusAnalyzer
-
-## Third-party Software
-This software incorporates the following third-party library:
-* [JSROOT](https://root.cern/js/) - Licensed under the GNU Lesser General Public License (LGPL), version 2.1.
-
-The original license file is included in the `web/jsroot/` directory.

@@ -1,4 +1,4 @@
-import { redraw, httpRequest } from './jsroot/modules/main.mjs';
+import { draw, redraw, cleanup, httpRequest } from './jsroot/modules/main.mjs';
 
 //---------------------------------------------------
 const state = {
@@ -33,7 +33,8 @@ async function init() {
         setupEventListeners();
         updateUIStates();
         await drawGrid();
-        
+
+	
         console.log("Initialization done.");
     } catch (err) {
 	console.error("Init failed:", err);
@@ -138,6 +139,8 @@ async function drawGrid() {
 	
         try {
             const obj = await httpRequest(`/${path}/root.json`, "object");
+//	    cleanup(divId);
+//            if (obj) await draw(divId, obj, "colz");
             if (obj) await redraw(divId, obj, "colz");
         } catch (e) {
             console.error(`Failed to draw ${path}:`, e);

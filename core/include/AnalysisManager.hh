@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <chrono>
 #include <TDatime.h>
 #include "DisplayOutput.hh"
 
@@ -17,11 +18,8 @@ public:
   virtual ~AnalysisManager();
 
   bool Initialize();
-  bool ProcessEvent();
-  void SetDisplayOutput(DisplayOutput* output){
-    fDispOutput = output;
-  }
-
+  int ProcessEvent();
+  void SetDisplayOutput(DisplayOutput* output); 
 
   Int_t  GetAnalysisBusyStatus(){return     fAnalysisBusyStatus;}
   Int_t* GetAnalysisBusyStatusPtr(){return &fAnalysisBusyStatus;}
@@ -33,6 +31,8 @@ public:
   Long64_t* GetAutoResetEventsPtr(){return &fAutoResetEvents;}
   
 private:
+  bool fIsHttpMaster;
+
   std::string fRIDFFile;
   TArtEventStore* fEventStore;
 
@@ -46,6 +46,10 @@ private:
   Long64_t fEntries;
   Long64_t fAutoResetEvents;
 
+  std::chrono::steady_clock::time_point fLastFigSaveTime;
+  bool fFigAutoSave;
+  int fFigSaveIntervalMinutes;
+  
   bool fIsInitialized;
 };
 

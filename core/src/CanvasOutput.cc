@@ -3,8 +3,7 @@
 #include <TH1.h>
 #include "ConfigManager.hh"
 #include "HistogramManager.hh"
-
-
+#include <TLatex.h>
 #include <termios.h>
 #include <unistd.h>
 #include <sys/select.h>
@@ -21,14 +20,15 @@ void SetTerminalRawMode(bool enable) {
 }
 
 CanvasOutput::CanvasOutput()
-  : fCanvas(nullptr), fRows(3), fCols(3),
+  : DisplayOutput(),
+    fCanvas(nullptr), fRows(3), fCols(3),
     fCurrentPage(-1), fIntervalMs(8000.0),
     fStopFlagPtr(nullptr)
 {
 }
 
 CanvasOutput::~CanvasOutput() {
-  if (fCanvas) delete fCanvas;
+  fCanvas = nullptr;
 }
 
 bool CanvasOutput::Initialize() {
@@ -53,7 +53,7 @@ bool CanvasOutput::Initialize() {
   int width  = config["display"].value("canvas_width", 800);
   int height = config["display"].value("canvas_height", 600);
   
-  fCanvas = new TCanvas("c1", "Online Monitor (Canvas Mode)", width, height);
+  fCanvas = new TCanvas("cCanvasOutput", "Online Monitor (Canvas Mode)", width, height);
 
   RegisterAnalysisBusyStatus();
   RegisterEntries();
@@ -91,10 +91,9 @@ void CanvasOutput::Update() {
 }
 
 void CanvasOutput::Draw() {
-  fCanvas->SetBatch(kTRUE);
-  fCanvas->Clear();
-  fCanvas->Divide(fCols, fRows);
 
+  fCanvas->Clear();
+  fCanvas->Divide(fCols, fRows, 0.01, 0.03);
   std::vector<std::string> allPaths = HistogramManager::GetInstance()->GetAllNames();
   std::vector<std::string> activePaths;
   for (const auto& path : allPaths) {
@@ -107,6 +106,7 @@ void CanvasOutput::Draw() {
 
   if (activePaths.empty()) return;
 
+    
   int histsPerPage = fRows * fCols;
   int maxPage = (activePaths.size() + histsPerPage - 1) / histsPerPage;
 
@@ -115,7 +115,9 @@ void CanvasOutput::Draw() {
   int startIdx = fCurrentPage * histsPerPage;
   for (int i = 0; i < histsPerPage; ++i) {
     int pathIdx = startIdx + i;
-    fCanvas->cd(i + 1);
+    TVirtualPad* pad = fCanvas->cd(i + 1);
+    if (!pad) continue;
+    pad->SetFillStyle(0); //transparent background
 
     if (pathIdx < (int)activePaths.size()) {
       TH1* h = HistogramManager::GetInstance()->GetTH1(activePaths[pathIdx]);
@@ -123,10 +125,10 @@ void CanvasOutput::Draw() {
     }
   }
 
-  fCanvas->SetBatch(kFALSE);
   fCanvas->Modified();
   fCanvas->Update();
-
+  gSystem->ProcessEvents();
+  
 }
 
 bool CanvasOutput::IsKeyPressed() {
@@ -163,6 +165,7 @@ int CanvasOutput::ExecuteKeyCommand() {
 	Draw();
 	fCanvas->Modified();
 	fCanvas->Update();
+	gSystem->ProcessEvents(); 
       } else if (input == 'b') { 
 
 	std::vector<std::string> allPaths = HistogramManager::GetInstance()->GetAllNames();
@@ -183,6 +186,7 @@ int CanvasOutput::ExecuteKeyCommand() {
 	Draw();
 	fCanvas->Modified();
 	fCanvas->Update();
+	gSystem->ProcessEvents(); 
       } else if (input == 'r') {
 	HistogramManager::GetInstance()->ResetAll();
 	Draw();

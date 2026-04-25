@@ -6,6 +6,7 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <TDirectory.h>
+#include <TCanvas.h>
 
 class HistogramManager {
 public:
@@ -32,6 +33,9 @@ public:
   TH1* GetTH1(const std::string& name);
   TH2* GetTH2(const std::string& name);
 
+  void InitStats();
+  void SaveFigures(Long64_t currentEvents, Long64_t resetThreshold);
+  
   void RequestResetAll();
   bool IsResetAllRequested() const { return fResetAllRequested; }
   void ClearResetAllRequest() { fResetAllRequested = false; }
@@ -50,7 +54,8 @@ private:
   bool fResetAllRequested;
   std::map<std::string, TH1*> fHistogramsMap;
   std::vector<TH1*> fHistograms;
-
+  TCanvas* fFigSaveCanvas;
+  
   void SetDirectory(TH1* h, const std::string& folder);
 };
 

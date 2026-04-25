@@ -12,7 +12,8 @@ extern "C" void Internal_GlobalReset() {
 }
 
 HttpOutput::HttpOutput()
-  : fHttpServer(nullptr), fServerTimeStr(nullptr) {
+  : DisplayOutput(),
+    fHttpServer(nullptr), fServerTimeStr(nullptr) {
 }
 
 HttpOutput::~HttpOutput() {
@@ -20,8 +21,6 @@ HttpOutput::~HttpOutput() {
 }
 
 bool HttpOutput::Initialize() {
-
-
   ConfigManager* cm = ConfigManager::GetInstance();
   const auto& config = cm->GetJson();
 
@@ -48,7 +47,6 @@ bool HttpOutput::Initialize() {
   if (!fHttpServer) return false;  
 
   fHttpServer->AddLocation("web/", http_root.c_str()); 
-  //fHttpServer->SetDefaultPage("web/index.html");
   fHttpServer->SetReadOnly(kFALSE);
 
   SetupHttpCommands();
@@ -65,6 +63,7 @@ bool HttpOutput::Initialize() {
   fHttpServer->Register("/Status", new TNamed("ServerStartTime",fServerStartTime.AsSQLString()));
   
   std::cout << "[HttpOutput] Web Server initialized, visit http://localhost:"<<port<<"/web/index.html" << std::endl;
+
   return true;
 }
 

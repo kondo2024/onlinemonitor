@@ -4,6 +4,7 @@
 #include <TApplication.h>
 #include <TInterpreter.h>
 #include <TSystem.h>
+#include <TStyle.h>
 
 #include "ConfigManager.hh"
 #include "HistogramManager.hh"
@@ -29,14 +30,17 @@ bool endWith(const std::string& str, const std::string& suffix) {
 }
 
 int main(int argc, char** argv) {
+  gStyle->SetOptStat(1111111);
+  gStyle->SetPadLeftMargin(0.15);
+  gStyle->SetOptDate(1);
+
   std::string mode = "web";// default
   const char* home = std::getenv("ONLINEMONITOR_HOME");
   if (!home){
     std::cerr<<"[OnlineMonitor] ONLINEMONITOR_HOME not set, run setup_onlinemonitor.sh"<<std::endl;
     return 1;
   }
-  //std::string inputRIDFFile("online");
-  std::string inputRIDFFile("aaa.ridf");
+  std::string inputRIDFFile("online");
   std::string inputconfigfile = std::string(home) + "/config/config.json";
 
   if (argc > 1) {
@@ -53,8 +57,6 @@ int main(int argc, char** argv) {
     }
   }
 
-  //    inputRIDFFile = argv[1];
-  
   if (argc > 2){
     std::string input2(argv[2]);
     if (endWith(input2, ".ridf") || endWith(input2, ".ridf.gz")) {
@@ -121,13 +123,8 @@ int main(int argc, char** argv) {
   AnalysisManager* analysisManager = new AnalysisManager(inputRIDFFile);
   if (!analysisManager->Initialize()) {
     std::cerr << "[OnlineMonitor] Error: AnalysisManager initialization failed." << std::endl;
-    // temptemptemp
-    //delete displayOutput;
-    //return 1;
-    // temptemptemp
   }
   analysisManager->SetDisplayOutput(displayOutput);
-  
   //---------------------------------------------
   // main loop
   std::cout<<std::endl;
@@ -135,17 +132,14 @@ int main(int argc, char** argv) {
   while (!gStopAnalysis) {
     gSystem->ProcessEvents();
 
-    if (displayOutput->IsKeyPressed()) {
-      int ret = displayOutput->ExecuteKeyCommand();
-      if (ret == -1) break;
-    }
-    
-    if (!analysisManager->ProcessEvent()) {
-      gSystem->Sleep(100); 
-    }
-
+    int ret = analysisManager->ProcessEvent();
+    if      (ret == -1) break;// quit
+    else if (ret != 0)  gSystem->Sleep(100); // no data, wait
   }
-
+  gSystem->ProcessEvents();
+  gSystem->ProcessEvents();
+  gSystem->ProcessEvents();
+  theApp.Terminate(0);
   //---------------------------------------------
   std::cout << "[OnlineMonitor] Cleaning up...  " << std::flush;
   delete analysisManager;

@@ -10,14 +10,18 @@ A real-time visualization tool using ANAROOT, ROOT-THttpServer and JSROOT.
 * JSROOT (compatible with ver 7.10.3)
 
 ## Installation
-1. git clone --recursive https://github.com/kondo2024/onlinemonitor.git
-1. Set ANAROOT Environment Variable (TARTSYS)
-2. Build: Compile using your Makefile or CMake.
-   cd onlinemonitor
-   mkdir build
-   mkdir install
-   cd build
-   cmake -DCMAKE_INSTALL_PREFIX=../install ../
+```
+git clone --recursive https://github.com/kondo2024/onlinemonitor.git
+```
+Set ANAROOT Environment Variable (TARTSYS)
+Build: Compile using your Makefile or CMake.
+```
+cd onlinemonitor
+mkdir build
+mkdir install
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=../install ../
+```
 
 
 ## Quick Usage

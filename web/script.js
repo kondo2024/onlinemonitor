@@ -111,8 +111,11 @@ async function drawGrid() {
     container.innerHTML = '';
     container.style.display = 'grid';
     container.style.gridTemplateColumns = `repeat(${state.settings.columns}, 1fr)`;
-    container.style.gridTemplateRows = `repeat(${state.settings.rows}, auto)`; 
+    //container.style.gridTemplateRows = `repeat(${state.settings.rows}, auto)`; 
+    container.style.gridTemplateRows = `repeat(${state.settings.rows}, 1fr)`; 
     container.style.alignContent = 'start';
+
+    const height = `${90/state.settings.rows}vh`
     
     const promises = items.map(async (path, i) => {
         const divId = `draw_div_${i}`;
@@ -120,7 +123,7 @@ async function drawGrid() {
         wrapper.className = 'grid-wrapper';
 	wrapper.style.position = 'relative';	
 
-	const boxHeight = "30vh"; 
+	const boxHeight = `${90/state.settings.rows}vh` 	
         wrapper.innerHTML = `<div id="${divId}" class="grid-item" style="height:${boxHeight}; min-height:250px;"></div>`;
         // --------------------
 	if (state.isRunning) {
@@ -139,8 +142,6 @@ async function drawGrid() {
 	
         try {
             const obj = await httpRequest(`/${path}/root.json`, "object");
-//	    cleanup(divId);
-//            if (obj) await draw(divId, obj, "colz");
             if (obj) await redraw(divId, obj, "colz");
         } catch (e) {
             console.error(`Failed to draw ${path}:`, e);
@@ -159,10 +160,9 @@ async function updateStatusInfo() {
     const autoResetEl = document.getElementById('auto-reset-info');
 
     try {
-        const [timeRes, startRes, configRes, entriesRes, busyRes] = await Promise.all([
+        const [timeRes, startRes, entriesRes, busyRes] = await Promise.all([
             httpRequest("/Status/ServerTime/root.json", "object"),
             httpRequest("/Status/ServerStartTime/root.json", "object"),
-            httpRequest("/Config/Contents/root.json", "object"),
             httpRequest("/Status/Entries/root.json", "object"),
             httpRequest("/Status/IsAnalysisBusy/root.json", "object")
         ]);
@@ -176,7 +176,8 @@ async function updateStatusInfo() {
 	if (startRes) state.server.startTime = startRes.fTitle;
 
         if (busyRes && busyRes.fVal === 1) {
-            elTime.textContent += " (BUSY)";
+	    elTime.textContent = timeRes.fTitle + (busyRes?.fVal === 1 ? " (BUSY)" : "");
+            //elTime.textContent += " (BUSY)";
         }
 
 	if (entriesRes && autoResetEl) {
@@ -192,12 +193,15 @@ async function updateStatusInfo() {
 	const total = state.activePaths.length;
 	const maxPage = Math.ceil(total / state.settings.histsPerPage) || 1;
 	if (elPage) elPage.innerText = `(Page ${state.currentPage + 1}/${maxPage})`;
+
+	const elPagein = document.getElementById('inputPage');
+        if (elPagein) elPagein.value = state.currentPage + 1;
 	
-        showDisconnected(false);
+        showDisconnected(false);// hide warning
         state.lastSuccessTime = Date.now();
 
     } catch (err) {
-        if ((Date.now() - state.lastSuccessTime) > 5000) showDisconnected(true);
+        if ((Date.now() - state.lastSuccessTime) > 5000) showDisconnected(true);// show warning
     }
 }
 //---------------------------------------------------

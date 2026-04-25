@@ -9,6 +9,7 @@
 #include <TDatime.h>
 #include <TLatex.h>
 #include <TSystem.h>
+#include <TStyle.h>
 
 using json = nlohmann::json;
 
@@ -121,10 +122,23 @@ void HistogramManager::SetDirectory(TH1* h, const std::string& folder) {
 }
 
 void HistogramManager::InitStats() {// dummy draw for reflecting gStyle settings
+  gStyle->SetOptStat(1111111);
+  gStyle->SetStatStyle(0);
+  gStyle->SetPadLeftMargin(0.1);
+  gStyle->SetOptDate(1);
+
   TVirtualPad *savePad = gPad;
   gROOT->SetBatch(kTRUE);
   if (!fFigSaveCanvas)
     fFigSaveCanvas = new TCanvas("cFigSave", "Batch Save", 1200, 900);
+
+  float rm = fFigSaveCanvas->GetRightMargin();
+  float tm = fFigSaveCanvas->GetTopMargin();
+  gStyle->SetStatX(1.0-rm-0.03);
+  gStyle->SetStatY(1.0-tm);
+  gStyle->SetStatW(0.25);
+  gStyle->SetStatH(0.2);
+
   for (const auto& h : fHistograms) h->Paint();
   fFigSaveCanvas->Update();
   gROOT->SetBatch(kFALSE);

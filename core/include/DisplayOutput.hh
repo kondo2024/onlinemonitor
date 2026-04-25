@@ -27,7 +27,9 @@ public:
   virtual Long64_t GetEntries(){return fEntriesPrm->GetVal();}
   
 protected:
-  DisplayOutput();
+  DisplayOutput()
+    : fIsAnalysisBusyStatusPrm(nullptr), fEntriesPrm(nullptr)
+  {}
   Int_t fIsAnalysisBusyStatus;
   Long64_t fEntries;
 

@@ -30,10 +30,6 @@ bool endWith(const std::string& str, const std::string& suffix) {
 }
 
 int main(int argc, char** argv) {
-  gStyle->SetOptStat(1111111);
-  gStyle->SetPadLeftMargin(0.15);
-  gStyle->SetOptDate(1);
-
   std::string mode = "web";// default
   const char* home = std::getenv("ONLINEMONITOR_HOME");
   if (!home){

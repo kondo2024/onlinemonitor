@@ -35,7 +35,7 @@ bool HttpOutput::Initialize() {
   }
   
   std::string http_root = std::string(home) + "/web/";
-  std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
+  //std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
     TString str = Form("http:%d",port);
     fHttpServer = new THttpServer(str.Data());

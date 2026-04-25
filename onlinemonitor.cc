@@ -12,6 +12,7 @@
 #include "HttpOutput.hh"
 #include "CanvasOutput.hh"
 #include <termios.h>
+#include <filesystem>
 #include <unistd.h>
 
 volatile sig_atomic_t gStopAnalysis = false;
@@ -22,6 +23,11 @@ void handle_signal(int sig) {
 
 }
 
+bool endWith(const std::string& str, const std::string& suffix) {
+  if (str.size() < suffix.size()) return false;
+  return str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
 int main(int argc, char** argv) {
   std::string mode = "web";// default
   const char* home = std::getenv("ONLINEMONITOR_HOME");
@@ -30,35 +36,49 @@ int main(int argc, char** argv) {
     return 1;
   }
   //std::string inputRIDFFile("online");
-  std::string inputRIDFFile("aaa");
+  std::string inputRIDFFile("aaa.ridf");
   std::string inputconfigfile = std::string(home) + "/config/config.json";
 
   if (argc > 1) {
     std::string input1(argv[1]);
     if (input1 == "--help" || input1 == "-h" ){
-      std::cerr << "Usage: " << argv[0] << " [run0000.ridf] [inputconfig.json]" << std::endl;
-      return 1;
+      std::cout << "Usage: " << argv[0] << " [inputconfig.json] [run0000.ridf]" << std::endl;
+      return 0;
     }
 
-    inputRIDFFile = argv[1];
-    std::ifstream ifs(inputRIDFFile.c_str());
-    if (!(inputRIDFFile=="0") && !ifs.good()){
+    if (endWith(input1, ".ridf") || endWith(input1, ".ridf.gz")) {
+      inputRIDFFile = input1;
+    }else if (endWith(input1, ".json")) {
+      inputconfigfile = input1;
+    }
+  }
+
+  //    inputRIDFFile = argv[1];
+  
+  if (argc > 2){
+    std::string input2(argv[2]);
+    if (endWith(input2, ".ridf") || endWith(input2, ".ridf.gz")) {
+      inputRIDFFile = input2;
+    }else if (endWith(input2, ".json")) {
+      inputconfigfile = input2;
+    }
+  }
+  
+  std::ifstream ifs_config(inputconfigfile.c_str());
+  if (!ifs_config.good()){
+    std::cerr << "Error: cannot open file: " << inputconfigfile << std::endl;
+    return 1;
+  }
+
+  if (inputRIDFFile != "online"){
+    std::ifstream ifs_ridf(inputRIDFFile.c_str());
+    if (!(inputRIDFFile=="0") && !ifs_ridf.good()){
       std::cerr << "Error: cannot open file: " << inputRIDFFile << std::endl;
       //return 1;
     }
     mode = "canvas";
   }
-
-  if (argc > 2){
-    std::string input2(argv[2]);
-    inputconfigfile = argv[2];
-    std::ifstream ifs(inputconfigfile.c_str());
-    if (!ifs.good()){
-      std::cerr << "Error: cannot open file: " << inputconfigfile << std::endl;
-      return 1;
-    }
-  }
-
+  
   TApplication theApp("App", &argc, argv);
 
   signal(SIGINT, handle_signal);

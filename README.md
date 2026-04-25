@@ -7,8 +7,10 @@ A real-time visualization tool using ANAROOT, ROOT-THttpServer and JSROOT.
 * ROOT 6 (with THttpServer enabled)
 * nlohmann/json (C++ JSON library)
 * C++17 compatible compiler
+* JSROOT (compatible with ver 7.10.3)
 
 ## Installation
+1. git clone --recursive https://github.com/kondo2024/onlinemonitor.git
 1. Set ANAROOT Environment Variable (TARTSYS)
 2. Build: Compile using your Makefile or CMake.
    cd onlinemonitor

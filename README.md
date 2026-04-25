@@ -18,13 +18,13 @@ A real-time visualization tool using ANAROOT, ROOT-THttpServer and JSROOT.
    mkdir install
    cd build
    cmake -DCMAKE_INSTALL_PREFIX=../install ../
-3. Run:
+
+
+## Quick Usage
    source install/bin/setup_onlinemonitor.sh
    online_monitor (online mode, )
    online_monitor online [config.json] (online, canvas mode)
    online_monitor ridffile [config.json] (offline, canvas mode)
-
-## Quick Usage
 Access the monitoring dashboard via your browser:
 * Main UI: http://localhost:8080/web/index.html
  * simple UI is also available at: http://localhost:8080

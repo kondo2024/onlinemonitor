@@ -3,9 +3,6 @@
 
 #include <string>
 
-class TArtEventStore;
-class HistogramManager;
-
 class BaseAnalyzer {
 public:
   BaseAnalyzer(const std::string& name) : fName(name) {}

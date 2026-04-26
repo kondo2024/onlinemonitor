@@ -76,7 +76,7 @@ Click Canvas, then keyboard control will be available.
 | save_interval_minutes| Time interval between each auto-save operation|
 
 ## To do
-- classified histograms by TFolder
+- classify histograms by TFolder
 - BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
 - BeamFocusAnalyzer and its parameters (relative positions) in json
 

@@ -2,7 +2,6 @@
 #define PlasticAnalyzer_hh
 
 #include "BaseAnalyzer.hh"
-#include <string>
 #include <TString.h>
 
 class TArtCalibPlastic;

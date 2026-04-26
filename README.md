@@ -79,8 +79,9 @@ Click Canvas, then keyboard control will be available.
 | auto_save            | if true, figures(png) are automatically saved periodically in background |
 | save_interval_minutes| Time interval between each auto-save operation|
 
-## to do
-- jsroot -> submodule
-- core, analyzer -> source/core,analyzer
-- PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer, BeamFocusAnalyzer
+## To do
+- option to/not to install submodules
+- classified histograms by TFolder
+- PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
+- BeamFocusAnalyzer and its parameters (relative positions) in json
 

@@ -20,8 +20,9 @@ AnalysisManager::AnalysisManager(std::string ridffile)
   : fIsHttpMaster(false),
     fRIDFFile(ridffile), fEventStore(nullptr), fDispOutput(nullptr),
     fAnalysisBusyStatus(1), fAutoResetEnabled(1), fEntries(0),
-    fAutoResetEvents(1000000), fIsInitialized(false),
-    fFigAutoSave(true), fFigSaveIntervalMinutes(10)
+    fAutoResetEvents(1000000),
+    fFigAutoSave(true), fFigSaveIntervalMinutes(10),
+    fIsInitialized(false)
 {}
 
 AnalysisManager::~AnalysisManager() {

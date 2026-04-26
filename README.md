@@ -10,11 +10,12 @@ A real-time visualization tool using ANAROOT, ROOT-THttpServer and JSROOT.
 * JSROOT (compatible with ver 7.10.3)
 
 ## Installation
+1. 
 ```
 git clone --recursive https://github.com/kondo2024/onlinemonitor.git
 ```
-Set ANAROOT Environment Variable (TARTSYS)
-Build: Compile using your Makefile or CMake.
+2. Set ANAROOT Environment Variable (TARTSYS)
+3. Build: Compile using your Makefile or CMake.
 ```
 cd onlinemonitor
 mkdir build
@@ -27,23 +28,22 @@ cmake -DCMAKE_INSTALL_PREFIX=../install ../
 ## Quick Usage
 ```
 source install/bin/setup_onlinemonitor.sh
-```
-### online mode, access to http://server:8080/web/index.html
-Access the monitoring dashboard via your browser:
-* Main UI: http://server:8080/web/index.html
-* simple UI is also available at: http://server:8080
-```
 online_monitor
 ```
-### load specific configuration json file
+### online mode
+* Main UI: http://server:8080/web/index.html
+* simple UI is also available at: http://server:8080
+
+Load specific configuration json file (online, canvas mode).
 ```
-online_monitor online [config.json] (online, canvas mode)
+online_monitor online [config.json]
 ```
-### offline mode, histograms are drawn in TCanvas
-Click Canvas, then keyboard control will be available.
+### offline mode
+histograms are drawn in TCanvas. 
 ```
 online_monitor ridffile [config.json] (offline, canvas mode)
 ```
+Click Canvas, then keyboard control will be available.
 
 ## Config (config.json)
 | Key | Description |

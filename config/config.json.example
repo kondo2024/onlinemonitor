@@ -1,0 +1,21 @@
+{
+    "analyzers": ["Test"],
+    "hist_range_file": "config/hist_ranges.json",
+    "skip_histograms":[
+	"hTest1"
+    ],
+    "auto_reset": true,
+    "auto_reset_events": 10000000,
+    "display": {
+	"update_interval_ms": 8000,
+	"default_rows": 3,
+	"default_columns": 3,
+	"canvas_width": 1200,
+	"canvas_height": 800
+    },
+    "fig": {
+	"auto_save": true,
+	"save_interval_minutes": 10
+    },
+    "http_port": 8080
+}

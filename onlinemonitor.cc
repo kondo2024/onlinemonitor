@@ -38,7 +38,19 @@ int main(int argc, char** argv) {
   }
   std::string inputRIDFFile("online");
   std::string inputconfigfile = std::string(home) + "/config/config.json";
+  // check default config file
+  std::ifstream ifs_defaultconfig(inputconfigfile.c_str());
+  if (!ifs_defaultconfig.good()){
+    std::cerr << "Error: make default cnofig files"<< std::endl;
+    std::cerr << "cd "<< home <<"/config"<< std::endl;
+    std::cerr << "cp config.json.example config.json" << std::endl;
+    std::cerr << "cp hist_ranges.json.example hist_ranges.json" << std::endl;
+    return 1;
+  }
 
+
+
+  
   if (argc > 1) {
     std::string input1(argv[1]);
     if (input1 == "--help" || input1 == "-h" ){

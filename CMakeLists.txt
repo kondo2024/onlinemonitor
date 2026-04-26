@@ -68,4 +68,5 @@ install(TARGETS onlinemonitor DESTINATION bin)
 install(FILES ${GEN_SETUP_SCRIPT} DESTINATION bin)
 install(DIRECTORY web DESTINATION .)
 install(DIRECTORY config DESTINATION .)
-install(DIRECTORY DESTINATION figs)
+# make install/figs directory
+install(DIRECTORY DESTINATION figs) 

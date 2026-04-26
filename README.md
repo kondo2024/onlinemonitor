@@ -57,40 +57,27 @@ Click Canvas, then keyboard control will be available.
 | :--- | :--- |
 | analyzers       | Array of Strings List of analyzer class names to be instantiated|
 | hist_range_file | String Path to the JSON file defining histogram binning and ranges|
-| skip_histograms | Array of Strings List of histogram names to be excluded from creation and display. Useful for debugging or reducing memory usage|
+| skip_histograms | Array of Strings List of histogram names to be excluded in the display|
+| http_port| TCP port number for the THttpServer (default: 8080)|
 
 ### Auto Reset (Statistics)
 | Key | Description |
 | :--- | :--- |
-| auto_reset       | Boolean If true, all histogram statistics will be cleared automatically when the event count reaches the threshold.|
-| auto_reset_events| Number The threshold of event entries for the auto-reset trigger.|
+| auto_reset       | If true, all histogram statistics will be cleared automatically when the event count reaches the threshold|
+| auto_reset_events| The threshold of event entries for the auto-reset|
 
 ### Display Settings (display)
 | Key | Description |
 | :--- | :--- |
-| update_interval_ms| Number Refresh rate for the JSROOT web interface in milliseconds.|
-| default_rows / default_columns| Number Initial layout of the histogram grid on the web UI.|
-| canvas_width / canvas_height| Number Internal canvas dimensions used for server-side rendering. This affects the relative positioning of the statistics box (TPaveStats) and font scaling.|
+| update_interval_ms| Time interval of display refresh in milliseconds|
+| default_rows / default_columns| Initial layout of the histogram grid|
+| canvas_width / canvas_height| Canvas dimensions for canvas mode |
 
 ### Figure Export (fig)
 | Key | Description |
 | :--- | :--- |
-| auto_save            | Boolean Enable/disable periodic background saving of histograms (e.g., as .png or .root files)|
-| save_interval_minutes| Number Time interval between each auto-save operation|
-
-### Network
-| Key | Description |
-| :--- | :--- |
-| http_port| Number TCP port number for the THttpServer (default: 8080)|
-
-## Config (config.json)
-| Key | Description |
-| :--- | :--- |
-| http_port | Web server port (default: 8080). |
-| auto_reset | Enable/disable automatic histogram reset. |
-| auto_reset_events | Number of events before an automatic reset. |
-| display | Set default_rows, default_columns, and update_interval_ms. |
-| skip_histograms | List of histogram names to hide from the UI. |
+| auto_save            | if true, figures(png) are automatically saved periodically in background |
+| save_interval_minutes| Time interval between each auto-save operation|
 
 ## to do
 - jsroot -> submodule

@@ -63,7 +63,7 @@ echo \"ONLINE_HOME: \$ONLINEMONITOR_HOME\"
 set(GEN_SETUP_SCRIPT "${CMAKE_BINARY_DIR}/setup_onlinemonitor.sh")
 file(WRITE "${GEN_SETUP_SCRIPT}" "${SETUP_SCRIPT_CONTENT}")
 
-install(FILES ${HEADERS} DESTINATION include)
+install(FILES ${HEADERS} DESTINATION include/onlinemonitor)
 install(TARGETS onlinemonitor DESTINATION bin)
 install(FILES ${GEN_SETUP_SCRIPT} DESTINATION bin)
 install(DIRECTORY web/ DESTINATION onlinemonitor/web)

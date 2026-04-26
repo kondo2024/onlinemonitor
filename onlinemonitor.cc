@@ -41,51 +41,7 @@ int main(int argc, char** argv) {
   // check default config file
   std::ifstream ifs_defaultconfig(inputconfigfile.c_str());
   if (!ifs_defaultconfig.good()){
-    std::cerr << "Error: make default cnofig files, like this"<< std::endl#include <iostream>
-#include <fstream>
-#include <signal.h>
-#include <TApplication.h>
-#include <TInterpreter.h>
-#include <TSystem.h>
-#include <TStyle.h>
-
-#include "ConfigManager.hh"
-#include "HistogramManager.hh"
-#include "AnalysisManager.hh"
-
-#include "HttpOutput.hh"
-#include "CanvasOutput.hh"
-#include <termios.h>
-#include <filesystem>
-#include <unistd.h>
-
-volatile sig_atomic_t gStopAnalysis = false;
-
-void handle_signal(int sig) {
-  std::cout << "\n[OnlineMonitor] Signal (" << sig << ") received. Stopping analysis..." << std::endl;
-  gStopAnalysis = 1;
-
-}
-
-bool endWith(const std::string& str, const std::string& suffix) {
-  if (str.size() < suffix.size()) return false;
-  return str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
-}
-
-int main(int argc, char** argv) {
-  std::string mode = "web";// default
-  const char* home = std::getenv("ONLINEMONITOR_HOME");
-  if (!home){
-    std::cerr<<"[OnlineMonitor] ONLINEMONITOR_HOME not set, run setup_onlinemonitor.sh"<<std::endl;
-    return 1;
-  }
-  std::string inputRIDFFile("online");
-  std::string inputconfigfile = std::string(home) + "/config/config.json";
-  // check default config file
-  std::ifstream ifs_defaultconfig(inputconfigfile.c_str());
-  if (!ifs_defaultconfig.good()){
-    std::cerr << "Error: make default cnofig files, like this"
-	      << std::endl<< std::endl;
+    std::cerr << "Error: make default cnofig files, like this"<< std::endl;
     std::cerr << "cd "<< home <<"/config"<< std::endl;
     std::cerr << "cp config.json.example config.json" << std::endl;
     std::cerr << "cp hist_ranges.json.example hist_ranges.json" << std::endl;

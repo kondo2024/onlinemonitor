@@ -65,7 +65,9 @@ file(WRITE "${GEN_SETUP_SCRIPT}" "${SETUP_SCRIPT_CONTENT}")
 
 install(FILES ${HEADERS} DESTINATION include/onlinemonitor)
 install(TARGETS onlinemonitor DESTINATION bin)
-install(FILES ${GEN_SETUP_SCRIPT} DESTINATION bin)
+install(FILES ${GEN_SETUP_SCRIPT}
+        DESTINATION bin
+        PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
 install(DIRECTORY web/ DESTINATION onlinemonitor/web)
 install(DIRECTORY config/ DESTINATION onlinemonitor/config)
 # make install/figs directory

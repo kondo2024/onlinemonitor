@@ -53,25 +53,35 @@ Click Canvas, then keyboard control will be available.
 
 ## Parameter Details of Config (config.json)
 ### Core Settings
-|analyzers      | Array of Strings List of analyzer class names to be instantiated|
-|hist_range_file| String Path to the JSON file defining histogram binning and ranges|
-|skip_histograms| Array of Strings List of histogram names to be excluded from creation and display. Useful for debugging or reducing memory usage|
+| Key | Description |
+| :--- | :--- |
+| analyzers       | Array of Strings List of analyzer class names to be instantiated|
+| hist_range_file | String Path to the JSON file defining histogram binning and ranges|
+| skip_histograms | Array of Strings List of histogram names to be excluded from creation and display. Useful for debugging or reducing memory usage|
 
 ### Auto Reset (Statistics)
-|auto_reset       | Boolean If true, all histogram statistics will be cleared automatically when the event count reaches the threshold.|
-|auto_reset_events| Number The threshold of event entries for the auto-reset trigger.|
+| Key | Description |
+| :--- | :--- |
+| auto_reset       | Boolean If true, all histogram statistics will be cleared automatically when the event count reaches the threshold.|
+| auto_reset_events| Number The threshold of event entries for the auto-reset trigger.|
 
 ### Display Settings (display)
-|update_interval_ms| Number Refresh rate for the JSROOT web interface in milliseconds.|
-|default_rows / default_columns| Number Initial layout of the histogram grid on the web UI.|
-|canvas_width / canvas_height| Number Internal canvas dimensions used for server-side rendering. This affects the relative positioning of the statistics box (TPaveStats) and font scaling.|
+| Key | Description |
+| :--- | :--- |
+| update_interval_ms| Number Refresh rate for the JSROOT web interface in milliseconds.|
+| default_rows / default_columns| Number Initial layout of the histogram grid on the web UI.|
+| canvas_width / canvas_height| Number Internal canvas dimensions used for server-side rendering. This affects the relative positioning of the statistics box (TPaveStats) and font scaling.|
 
 ### Figure Export (fig)
-|auto_save            | Boolean Enable/disable periodic background saving of histograms (e.g., as .png or .root files)|
-|save_interval_minutes| Number Time interval between each auto-save operation|
+| Key | Description |
+| :--- | :--- |
+| auto_save            | Boolean Enable/disable periodic background saving of histograms (e.g., as .png or .root files)|
+| save_interval_minutes| Number Time interval between each auto-save operation|
 
 ### Network
-|http_port| Number TCP port number for the THttpServer (default: 8080)|
+| Key | Description |
+| :--- | :--- |
+| http_port| Number TCP port number for the THttpServer (default: 8080)|
 
 ## Config (config.json)
 | Key | Description |

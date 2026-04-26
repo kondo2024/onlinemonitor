@@ -55,14 +55,10 @@ Click Canvas, then keyboard control will be available.
 ### Core Settings
 | Key | Description |
 | :--- | :--- |
-| analyzers       | Array of Strings List of analyzer class names to be instantiated|
-| hist_range_file | String Path to the JSON file defining histogram binning and ranges|
-| skip_histograms | Array of Strings List of histogram names to be excluded in the display|
+| analyzers       | String list of analyzer class names to be instantiated|
+| hist_range_file | Path to the JSON file defining histogram binning and ranges, should be located at the same dir as config.json|
+| skip_histograms | String list of histogram names to be excluded in the display|
 | http_port| TCP port number for the THttpServer (default: 8080)|
-
-### Auto Reset (Statistics)
-| Key | Description |
-| :--- | :--- |
 | auto_reset       | If true, all histogram statistics will be cleared automatically when the event count reaches the threshold|
 | auto_reset_events| The threshold of event entries for the auto-reset|
 
@@ -73,7 +69,7 @@ Click Canvas, then keyboard control will be available.
 | default_rows / default_columns| Initial layout of the histogram grid|
 | canvas_width / canvas_height| Canvas dimensions for canvas mode |
 
-### Figure Export (fig)
+### Figure Auto Save (fig)
 | Key | Description |
 | :--- | :--- |
 | auto_save            | if true, figures(png) are automatically saved periodically in background |
@@ -81,6 +77,6 @@ Click Canvas, then keyboard control will be available.
 
 ## To do
 - classified histograms by TFolder
-- PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
+- BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
 - BeamFocusAnalyzer and its parameters (relative positions) in json
 

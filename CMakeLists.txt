@@ -54,8 +54,8 @@ set(SETUP_SCRIPT_CONTENT
 
 export TARTSYS=\"$ENV{TARTSYS}\"
 source $TARTSYS/scripts/setup.sh
-export ONLINEMONITOR_HOME=\"${ABS_INSTALL_DIR}\"
-export PATH=\"\$ONLINEMONITOR_HOME/bin:\$PATH\"
+export ONLINEMONITOR_HOME=\"${ABS_INSTALL_DIR}/onlinemonitor\"
+export PATH=\"${ABS_INSTALL_DIR}/bin:\$PATH\"
 
 echo \"[OnlineMonitor] Environment variables set.\"
 echo \"ONLINE_HOME: \$ONLINEMONITOR_HOME\"
@@ -66,7 +66,7 @@ file(WRITE "${GEN_SETUP_SCRIPT}" "${SETUP_SCRIPT_CONTENT}")
 install(FILES ${HEADERS} DESTINATION include)
 install(TARGETS onlinemonitor DESTINATION bin)
 install(FILES ${GEN_SETUP_SCRIPT} DESTINATION bin)
-install(DIRECTORY web DESTINATION .)
-install(DIRECTORY config DESTINATION .)
+install(DIRECTORY web/ DESTINATION onlinemonitor/web)
+install(DIRECTORY config/ DESTINATION onlinemonitor/config)
 # make install/figs directory
-install(DIRECTORY DESTINATION figs) 
+install(DIRECTORY DESTINATION onlinemonitor/figs) 

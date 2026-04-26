@@ -12,8 +12,9 @@ public:
   virtual ~BaseAnalyzer() {}
 
   virtual bool Init() = 0;
-  virtual bool Process() = 0;
-  virtual void Reset() {}
+  virtual void ReconstructData() = 0;
+  virtual void Fill() = 0;
+  virtual void ClearData() = 0;
 
   std::string GetName() const { return fName; }
 

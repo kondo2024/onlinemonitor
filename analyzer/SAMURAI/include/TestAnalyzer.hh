@@ -25,14 +25,15 @@ public:
     return true;
   }
 
-  bool Process() override {
+  void ReconstructData() override {}
+  void Fill() override {
     for (int i=0;i<10;++i)
       hTest[i]->Fill(rand()%100 + i*10);
 
     hTest[10]->Fill(rand()%100,rand()%100);
     
-    return true;
   }
+  void ClearData() override {}
 
 private:
   TH1* hTest[11];

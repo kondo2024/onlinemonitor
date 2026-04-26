@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
   
   if (!displayOutput) {
     std::cerr << "[DisplayManager] Failed to create DisplayOutput for mode:" << mode << std::endl;
-    return false;
+    return 1;
   }
   displayOutput->Initialize();
   
@@ -131,6 +131,7 @@ int main(int argc, char** argv) {
   AnalysisManager* analysisManager = new AnalysisManager(inputRIDFFile);
   if (!analysisManager->Initialize()) {
     std::cerr << "[OnlineMonitor] Error: AnalysisManager initialization failed." << std::endl;
+    return 1;
   }
   analysisManager->SetDisplayOutput(displayOutput);
   //---------------------------------------------

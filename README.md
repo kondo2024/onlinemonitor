@@ -80,7 +80,6 @@ Click Canvas, then keyboard control will be available.
 | save_interval_minutes| Time interval between each auto-save operation|
 
 ## To do
-- option to/not to install submodules
 - classified histograms by TFolder
 - PlasticAnalyzer, BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
 - BeamFocusAnalyzer and its parameters (relative positions) in json

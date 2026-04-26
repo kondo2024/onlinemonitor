@@ -4,6 +4,7 @@
 #include "DisplayOutput.hh"
 #include "HttpOutput.hh"
 #include "TestAnalyzer.hh"
+#include "PlasticAnalyzer.hh"
 // #include "BDCAnalyzer.hh"
 
 #include <TArtEventStore.hh>
@@ -42,21 +43,23 @@ bool AnalysisManager::Initialize() {
   if (config.contains("analyzers")){
     std::vector<std::string> analyzerList = config["analyzers"];
     for (const auto& name : analyzerList) {
-      if (name == "Test") {
-	fAnalyzers.push_back(new TestAnalyzer());
-	std::cout << "[AnalysisManager] Analyzer registered: " << name << std::endl;
-      }
+
+      if (name == "Plastic") fAnalyzers.push_back(new PlasticAnalyzer());
+      if (name == "Test")    fAnalyzers.push_back(new TestAnalyzer());
+
     }
   }else{
     std::cout<<"[AnalysisManager] Error: no analyzer is defined in config.json"<<std::endl;
     return false;
   }
 
+  for (auto analyzer : fAnalyzers)
+    std::cout << "[AnalysisManager] Analyzer registered: " << analyzer->GetName() << std::endl;
+  
   for (auto analyzer : fAnalyzers) {
-    analyzer->Init();
+    bool ret = analyzer->Init();
+    if (!ret) return false;
   }
-
-  // 
   HistogramManager::GetInstance()->InitStats();
   
   // parameters
@@ -94,13 +97,12 @@ int AnalysisManager::ProcessEvent() {
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
-
     // temptemptemp
     //if (!fEventStore->GetNextEvent()) return 1;
-
-    for (auto analyzer : fAnalyzers) {
-      analyzer->Process();
-    }
+    for (auto analyzer : fAnalyzers) analyzer->ReconstructData();
+    for (auto analyzer : fAnalyzers) analyzer->Fill();
+    for (auto analyzer : fAnalyzers) analyzer->ClearData();
+    
     fEntries++;
   }
 

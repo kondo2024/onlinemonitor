@@ -3,13 +3,15 @@
 
 #include "BaseAnalyzer.hh"
 #include <TString.h>
+#include <string>
 
 class TArtCalibPlastic;
 class TH1;
 
 class PlasticAnalyzer : public BaseAnalyzer {
 public:
-  PlasticAnalyzer();
+  PlasticAnalyzer(std::string name)
+    : BaseAnalyzer(name){}
   virtual ~PlasticAnalyzer() {}
 
   virtual bool Init() override;

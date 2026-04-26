@@ -8,10 +8,6 @@
 #include <iostream>
 
 //--------------------------------------------------------
-PlasticAnalyzer::PlasticAnalyzer()
-  : BaseAnalyzer("Plastic")
-{}
-//--------------------------------------------------------
 bool PlasticAnalyzer::Init(){
   TArtBigRIPSParameters *brprm = TArtBigRIPSParameters::Instance();
   bool ret = brprm->LoadParameter((char*)fdbFileName.Data());

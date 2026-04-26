@@ -14,7 +14,7 @@ class BaseAnalyzer;
 
 class AnalysisManager {
 public:
-  AnalysisManager(std::string ridffile);
+  AnalysisManager(std::string ridffile="online");
   virtual ~AnalysisManager();
 
   bool Initialize();
@@ -31,26 +31,26 @@ public:
   Long64_t* GetAutoResetEventsPtr(){return &fAutoResetEvents;}
   
 private:
-  bool fIsHttpMaster;
+  bool fIsHttpMaster = false;
 
   std::string fRIDFFile;
-  TArtEventStore* fEventStore;
+  TArtEventStore* fEventStore = nullptr;
 
-  DisplayOutput* fDispOutput;
+  DisplayOutput* fDispOutput = nullptr;
 
   std::vector<BaseAnalyzer*> fAnalyzers;
 
   // for THttpServer
-  Int_t fAnalysisBusyStatus;// 1: analysis is busy
-  Int_t fAutoResetEnabled;
-  Long64_t fEntries;
-  Long64_t fAutoResetEvents;
+  Int_t fAnalysisBusyStatus = 1;// 1: analysis is busy
+  Int_t fAutoResetEnabled = 1;
+  Long64_t fEntries = 0;
+  Long64_t fAutoResetEvents = 1000000;
 
   std::chrono::steady_clock::time_point fLastFigSaveTime;
-  bool fFigAutoSave;
-  int fFigSaveIntervalMinutes;
+  bool fFigAutoSave = true;
+  int fFigSaveIntervalMinutes = 10;
   
-  bool fIsInitialized;
+  bool fIsInitialized = false;
 };
 
 #endif

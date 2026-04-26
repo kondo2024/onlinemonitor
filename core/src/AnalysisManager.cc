@@ -18,12 +18,7 @@ using json = nlohmann::json;
 
 
 AnalysisManager::AnalysisManager(std::string ridffile) 
-  : fIsHttpMaster(false),
-    fRIDFFile(ridffile), fEventStore(nullptr), fDispOutput(nullptr),
-    fAnalysisBusyStatus(1), fAutoResetEnabled(1), fEntries(0),
-    fAutoResetEvents(1000000),
-    fFigAutoSave(true), fFigSaveIntervalMinutes(10),
-    fIsInitialized(false)
+  : fRIDFFile(ridffile)
 {}
 
 AnalysisManager::~AnalysisManager() {
@@ -44,8 +39,8 @@ bool AnalysisManager::Initialize() {
     std::vector<std::string> analyzerList = config["analyzers"];
     for (const auto& name : analyzerList) {
 
-      if (name == "Plastic") fAnalyzers.push_back(new PlasticAnalyzer());
-      if (name == "Test")    fAnalyzers.push_back(new TestAnalyzer());
+      if (name == "Plastic") fAnalyzers.push_back(new PlasticAnalyzer(name));
+      if (name == "Test")    fAnalyzers.push_back(new TestAnalyzer(name));
 
     }
   }else{

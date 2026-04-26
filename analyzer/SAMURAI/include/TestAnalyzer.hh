@@ -8,8 +8,10 @@
 
 class TestAnalyzer : public BaseAnalyzer {
 public:
-  TestAnalyzer() : BaseAnalyzer("Test") {}
-
+  TestAnalyzer(std::string name)
+    : BaseAnalyzer(name) {}
+  ~TestAnalyzer(){}
+  
   bool Init() override {
 
     HistogramManager* hm = HistogramManager::GetInstance();

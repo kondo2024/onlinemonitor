@@ -30,7 +30,6 @@ bool BDCAnalyzer::Init(){
   fCalibBDC1Track->SetTDCWindow(0,3000);
   fCalibBDC2Track->SetTDCWindow(0,3000);
   ret = LoadDCTDCDistribution();
-  if (!ret) return false;
   
   HistogramManager* hm = HistogramManager::GetInstance();
 
@@ -50,9 +49,9 @@ bool BDCAnalyzer::Init(){
 			     128,0.5,128.5,100,0,1000,"BDC");
 
   fhbdc1_xy = hm->BookTH2("BDC1_xy","BDC1 XY;X;Y",
-			  100,-80,80, 100,80,-80,"BDC");
+			  100,-80,80, 100,-80,80,"BDC");
   fhbdc2_xy = hm->BookTH2("BDC2_xy","BDC2 XY;X;Y",
-			  100,-80,80, 100,80,-80,"BDC");
+			  100,-80,80, 100,-80,80,"BDC");
 
   
   return true;
@@ -198,6 +197,7 @@ bool BDCAnalyzer::LoadDCTDCDistribution() {
     fTDCDistFileName = config["analyzer"]["dc_tdc_file"];
   }else{
     std::cout << "\e[35m " << "Define dc_tdc_file in config.json, if you need tracking " << "\e[0m" << std::endl;
+    return false;
   }
   
   TDirectory *pwd = gDirectory;

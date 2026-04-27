@@ -16,7 +16,8 @@ public:
 
     HistogramManager* hm = HistogramManager::GetInstance();
     
-    for (int i=0;i<10;++i){
+    //for (int i=0;i<10;++i){
+    for (int i=0;i<1;++i){
       hTest[i] = hm->BookTH1(Form("hTest%d",i),
 			    Form("Test Histogram %d;Value;Counts",i),
 			    100, 0, 100, "Test");
@@ -29,7 +30,8 @@ public:
 
   void ReconstructData() override {}
   void Fill() override {
-    for (int i=0;i<10;++i)
+    //for (int i=0;i<10;++i)
+    for (int i=0;i<1;++i)
       hTest[i]->Fill(rand()%100 + i*10);
 
     hTest[10]->Fill(rand()%100,rand()%100);

@@ -5,11 +5,14 @@
 #include "HttpOutput.hh"
 #include "TestAnalyzer.hh"
 #include "PlasticAnalyzer.hh"
-// #include "BDCAnalyzer.hh"
+#include "HODAnalyzer.hh"
+#include "NEBULAAnalyzer.hh"
+#include "BDCAnalyzer.hh"
 
 #include <TArtEventStore.hh>
 #include <TSystem.h>
 #include <TROOT.h>
+#include <TString.h>
 #include <iostream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -35,16 +38,25 @@ bool AnalysisManager::Initialize() {
   // definition of analyzers
   auto config = ConfigManager::GetInstance()->GetJson();
 
-  if (config.contains("analyzers")){
-    std::vector<std::string> analyzerList = config["analyzers"];
+  if (config.contains("analyzer") && config["analyzer"].contains("list") ){
+    std::vector<std::string> analyzerList = config["analyzer"]["list"];
     for (const auto& name : analyzerList) {
 
-      if (name == "Plastic") fAnalyzers.push_back(new PlasticAnalyzer(name));
-      if (name == "Test")    fAnalyzers.push_back(new TestAnalyzer(name));
-
+      TString name_ts(name);
+      name_ts.ToUpper();
+      
+      if      (name_ts == "PLASTIC") fAnalyzers.push_back(new PlasticAnalyzer(name));
+      else if (name_ts == "HOD")     fAnalyzers.push_back(new HODAnalyzer(name));
+      else if (name_ts == "NEBULA")  fAnalyzers.push_back(new NEBULAAnalyzer(name));
+      else if (name_ts == "BDC")     fAnalyzers.push_back(new BDCAnalyzer(name));
+      else if (name_ts == "TEST")    fAnalyzers.push_back(new TestAnalyzer(name));
+      else {
+	std::cerr<<"[AnalysisManager] Error: unknown analyzer="<<name<<" in config.json"<<std::endl;
+	return false;
+      }
     }
   }else{
-    std::cout<<"[AnalysisManager] Error: no analyzer is defined in config.json"<<std::endl;
+    std::cerr<<"[AnalysisManager] Error: no analyzer is defined in config.json"<<std::endl;
     return false;
   }
 

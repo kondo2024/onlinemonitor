@@ -1,5 +1,11 @@
 {
-    "analyzers": ["Test"],
+    "analyzer": {
+        "list": ["Test"],
+	"dc_tdc_file": "aaaa.root",
+	"z_bdc1": -2000,
+	"z_bdc2": -1000,
+	"z_target": 0
+    },	  
     "hist_range_file": "config/hist_ranges.json",
     "skip_histograms":[
 	"hTest1"

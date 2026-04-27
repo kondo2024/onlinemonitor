@@ -18,9 +18,9 @@ bool NEBULAAnalyzer::Init(){
   HistogramManager* hm = HistogramManager::GetInstance();
 
   fhidtu = hm->BookTH2("NEBULA_idtu","NEBULA ID-TUraw;ID;TUraw",
-		       144,0.5,144.5,100,0,80000,"NEBULA");
+		       144,0.5,144.5,100,0,10000,"NEBULA");
   fhidtd = hm->BookTH2("NEBULA_idtd","NEBULA ID-TDraw;ID;TDraw",
-		       144,0.5,144.5,100,0,80000,"NEBULA");
+		       144,0.5,144.5,100,0,10000,"NEBULA");
   fhidqu = hm->BookTH2("NEBULA_idqu","NEBULA ID-QUraw;ID;QUraw",
 		       144,0.5,144.5,100,0,4000,"NEBULA");
   fhidqd = hm->BookTH2("NEBULA_idqd","NEBULA ID-QDraw;ID;QDraw",

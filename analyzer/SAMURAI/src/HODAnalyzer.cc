@@ -18,13 +18,14 @@ bool HODAnalyzer::Init(){
   HistogramManager* hm = HistogramManager::GetInstance();
 
   fhidtu = hm->BookTH2("HOD_idtu","HOD ID-TUraw;ID;TUraw",
-		       48,0.5,48.5,100,0,80000,"HOD");
+		       40,0.5,40.5,100,0,40000,"HOD");
   fhidtd = hm->BookTH2("HOD_idtd","HOD ID-TDraw;ID;TDraw",
-		       48,0.5,48.5,100,0,80000,"HOD");
+		       40,0.5,40.5,100,0,40000,"HOD");
   fhidqu = hm->BookTH2("HOD_idqu","HOD ID-QUraw;ID;QUraw",
-		       48,0.5,48.5,100,0,4000,"HOD");
+		       40,0.5,40.5,100,0,4000,"HOD");
   fhidqd = hm->BookTH2("HOD_idqd","HOD ID-QDraw;ID;QDraw",
-		       48,0.5,48.5,100,0,4000,"HOD");
+		       40,0.5,40.5,100,0,4000,"HOD");
+
   return true;
 }
 //--------------------------------------------------------

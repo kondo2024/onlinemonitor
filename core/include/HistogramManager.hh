@@ -34,6 +34,7 @@ public:
   TH2* GetTH2(const std::string& name);
 
   void InitStats();
+  void SetStyle();
   void SaveFigures(Long64_t currentEvents, Long64_t resetThreshold);
   
   void RequestResetAll();

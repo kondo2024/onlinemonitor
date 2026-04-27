@@ -122,11 +122,8 @@ void HistogramManager::SetDirectory(TH1* h, const std::string& folder) {
 }
 
 void HistogramManager::InitStats() {// dummy draw for reflecting gStyle settings
-  gStyle->SetOptStat(1111111);
-  gStyle->SetStatStyle(0);
-  gStyle->SetPadLeftMargin(0.1);
-  gStyle->SetOptDate(1);
 
+  SetStyle();
   TVirtualPad *savePad = gPad;
   gROOT->SetBatch(kTRUE);
   if (!fFigSaveCanvas)
@@ -134,15 +131,46 @@ void HistogramManager::InitStats() {// dummy draw for reflecting gStyle settings
 
   float rm = fFigSaveCanvas->GetRightMargin();
   float tm = fFigSaveCanvas->GetTopMargin();
-  gStyle->SetStatX(1.0-rm-0.03);
-  gStyle->SetStatY(1.0-tm);
-  gStyle->SetStatW(0.25);
-  gStyle->SetStatH(0.2);
+//  gStyle->SetStatX(1.0-rm-0.03);
+//  gStyle->SetStatY(1.0-tm);
+//  gStyle->SetStatW(0.25);
+//  gStyle->SetStatH(0.2);
 
   for (const auto& h : fHistograms) h->Paint();
   fFigSaveCanvas->Update();
   gROOT->SetBatch(kFALSE);
   if (savePad) savePad->cd();
+}
+void HistogramManager::SetStyle(){
+  gStyle->SetHistFillColor(7);
+  gStyle->SetHistFillStyle(3002);
+  gStyle->SetHistLineColor(kBlue);
+  gStyle->SetFuncColor(kRed);
+  gStyle->SetFrameLineWidth(2);
+  gStyle->SetPadGridX(1);
+  gStyle->SetPadGridY(1);
+  gStyle->SetCanvasColor(0);
+  gStyle->SetTitleFillColor(0);
+  gStyle->SetTitleStyle(0);
+  gStyle->SetStatColor(0);
+  gStyle->SetStatStyle(0);
+  gStyle->SetStatX(0.9);
+  gStyle->SetStatY(0.9);
+  gStyle->SetPalette(1,0);
+  gStyle->SetOptLogz(1);
+  gStyle->SetOptFit(1);
+  gStyle->SetOptStat(1111111);
+  gStyle->SetPadBorderMode(1);
+  gStyle->SetOptDate(1);
+
+  gStyle->SetLabelFont(132,"XYZ");
+  gStyle->SetTitleFont(132,"XYZ");
+  gStyle->SetTitleFont(132,"");
+  gStyle->SetTextFont(132);
+  gStyle->SetStatFont(132);
+  gStyle->SetCanvasDefW(800);
+  gStyle->SetCanvasDefH(800);
+  gStyle->SetPaperSize(20,20);
 }
 
 void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThreshold) {

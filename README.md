@@ -77,6 +77,6 @@ Click Canvas, then keyboard control will be available.
 
 ## To do
 - classify histograms by TFolder
-- BDCAnalyzer, FDCAnalyzer, HODAnalyzer, NEBULAAnalyzer, PPACAnalyzer
+- BDCAnalyzer, FDCAnalyzer, PPACAnalyzer
 - BeamFocusAnalyzer and its parameters (relative positions) in json
 

@@ -17,13 +17,13 @@ bool NEBULAAnalyzer::Init(){
 
   HistogramManager* hm = HistogramManager::GetInstance();
 
-  fhidtu = hm->BookTH2("hNEBULA_idtu","NEBULA ID-TUraw;ID;TUraw",
+  fhidtu = hm->BookTH2("NEBULA_idtu","NEBULA ID-TUraw;ID;TUraw",
 		       144,0.5,144.5,100,0,80000,"NEBULA");
-  fhidtd = hm->BookTH2("hNEBULA_idtd","NEBULA ID-TDraw;ID;TDraw",
+  fhidtd = hm->BookTH2("NEBULA_idtd","NEBULA ID-TDraw;ID;TDraw",
 		       144,0.5,144.5,100,0,80000,"NEBULA");
-  fhidqu = hm->BookTH2("hNEBULA_idqu","NEBULA ID-QUraw;ID;QUraw",
+  fhidqu = hm->BookTH2("NEBULA_idqu","NEBULA ID-QUraw;ID;QUraw",
 		       144,0.5,144.5,100,0,4000,"NEBULA");
-  fhidqd = hm->BookTH2("hNEBULA_idqd","NEBULA ID-QDraw;ID;QDraw",
+  fhidqd = hm->BookTH2("NEBULA_idqd","NEBULA ID-QDraw;ID;QDraw",
 		       144,0.5,144.5,100,0,4000,"NEBULA");
   return true;
 }

@@ -34,24 +34,24 @@ bool BDCAnalyzer::Init(){
   
   HistogramManager* hm = HistogramManager::GetInstance();
 
-  fhbdc1_idtl = hm->BookTH2("hBDC1_idtl","BDC1 ID-T(leading);ID;T(leading)",
+  fhbdc1_idtl = hm->BookTH2("BDC1_idtl","BDC1 ID-T(leading);ID;T(leading)",
 			    128,0.5,128.5,100,0,3000,"BDC");
-  fhbdc2_idtl = hm->BookTH2("hBDC2_idtl","BDC2 ID-T(leading);ID;T(leading)",
-			    128,0.5,128.5,100,0,3000,"BDC");
-
-  fhbdc1_idtt = hm->BookTH2("hBDC1_idtt","BDC1 ID-T(trailing);ID;T(trailing)",
-			    128,0.5,128.5,100,0,3000,"BDC");
-  fhbdc2_idtt = hm->BookTH2("hBDC2_idtt","BDC2 ID-T(trailing);ID;T(trailing)",
+  fhbdc2_idtl = hm->BookTH2("BDC2_idtl","BDC2 ID-T(leading);ID;T(leading)",
 			    128,0.5,128.5,100,0,3000,"BDC");
 
-  fhbdc1_idtot = hm->BookTH2("hBDC1_idtot","BDC1 ID-ToT;ID;ToT",
+  fhbdc1_idtt = hm->BookTH2("BDC1_idtt","BDC1 ID-T(trailing);ID;T(trailing)",
+			    128,0.5,128.5,100,0,3000,"BDC");
+  fhbdc2_idtt = hm->BookTH2("BDC2_idtt","BDC2 ID-T(trailing);ID;T(trailing)",
+			    128,0.5,128.5,100,0,3000,"BDC");
+
+  fhbdc1_idtot = hm->BookTH2("BDC1_idtot","BDC1 ID-ToT;ID;ToT",
 			     128,0.5,128.5,100,0,1000,"BDC");
-  fhbdc2_idtot = hm->BookTH2("hBDC2_idtot","BDC2 ID-ToT;ID;ToT",
+  fhbdc2_idtot = hm->BookTH2("BDC2_idtot","BDC2 ID-ToT;ID;ToT",
 			     128,0.5,128.5,100,0,1000,"BDC");
 
-  fhbdc1_xy = hm->BookTH2("hBDC1_xy","BDC1 XY;X;Y",
+  fhbdc1_xy = hm->BookTH2("BDC1_xy","BDC1 XY;X;Y",
 			  100,-80,80, 100,80,-80,"BDC");
-  fhbdc2_xy = hm->BookTH2("hBDC2_xy","BDC2 XY;X;Y",
+  fhbdc2_xy = hm->BookTH2("BDC2_xy","BDC2 XY;X;Y",
 			  100,-80,80, 100,80,-80,"BDC");
 
   

@@ -17,13 +17,13 @@ bool PlasticAnalyzer::Init(){
 
   HistogramManager* hm = HistogramManager::GetInstance();
 
-  fhidtl = hm->BookTH2("hPlastic_idtl","Plastic ID-TLraw;ID;TLraw",
+  fhidtl = hm->BookTH2("Plastic_idtl","Plastic ID-TLraw;ID;TLraw",
 		       10,0.5,10.5,100,0,80000,"Plastic");
-  fhidtr = hm->BookTH2("hPlastic_idtr","Plastic ID-TRraw;ID;TRraw",
+  fhidtr = hm->BookTH2("Plastic_idtr","Plastic ID-TRraw;ID;TRraw",
 		       10,0.5,10.5,100,0,80000,"Plastic");
-  fhidql = hm->BookTH2("hPlastic_idql","Plastic ID-QLraw;ID;QLraw",
+  fhidql = hm->BookTH2("Plastic_idql","Plastic ID-QLraw;ID;QLraw",
 		       10,0.5,10.5,100,0,4000,"Plastic");
-  fhidqr = hm->BookTH2("hPlastic_idqr","Plastic ID-QRraw;ID;QRraw",
+  fhidqr = hm->BookTH2("Plastic_idqr","Plastic ID-QRraw;ID;QRraw",
 		       10,0.5,10.5,100,0,4000,"Plastic");
   return true;
 }

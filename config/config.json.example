@@ -1,6 +1,6 @@
-{
+{ 
     "analyzer": {
-        "list": ["Test"],
+        "list": ["Test", "plastic", "BDC", "nebula"],
 	"dc_tdc_file": "aaaa.root",
 	"z_bdc1": -2000,
 	"z_bdc2": -1000,

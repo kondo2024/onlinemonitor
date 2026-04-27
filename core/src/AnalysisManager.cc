@@ -85,12 +85,12 @@ bool AnalysisManager::Initialize() {
   }
   
   fEventStore = new TArtEventStore();
-//  if (fRIDFFile=="online"){
-//    fEventStore->Open(0);
-//  }else if (!fEventStore->Open(fRIDFFile.c_str())) {
-//    std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
-//    return false;
-//  }
+  if (fRIDFFile=="online"){
+    fEventStore->Open(0);
+  }else if (!fEventStore->Open(fRIDFFile.c_str())) {
+    std::cerr << "[AnalysisManager] Error: Cannot open EventStore." << std::endl;
+    return false;
+  }
 
 
   fLastFigSaveTime = std::chrono::steady_clock::now(); 
@@ -108,12 +108,11 @@ int AnalysisManager::ProcessEvent() {
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
-    // temptemptemp
-    //if (!fEventStore->GetNextEvent()) return 1;
+    if (!fEventStore->GetNextEvent()) return 1;
     for (auto analyzer : fAnalyzers) analyzer->ReconstructData();
     for (auto analyzer : fAnalyzers) analyzer->Fill();
     for (auto analyzer : fAnalyzers) analyzer->ClearData();
-    
+    fEventStore->ClearData();
     fEntries++;
   }
 

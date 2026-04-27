@@ -38,6 +38,12 @@ bool FDC1Analyzer::Init(){
   fhfdc1_xy = hm->BookTH2("FDC1_xy","FDC1 XY;X;Y",
                           100,-250,250, 100,-250,250,"FDC1");
 
+  fhfdc1_xa = hm->BookTH2("FDC2_xa","FDC2 XA;X;A",
+                          100,-250,250, 100,-1,1,"FDC1");
+
+  fhfdc1_xb = hm->BookTH2("FDC2_yb","FDC2 YB;Y;B",
+                          100,-250,250, 100,-1,1,"FDC1");
+
   return true;
 }
 

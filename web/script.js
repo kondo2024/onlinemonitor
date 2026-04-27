@@ -46,9 +46,11 @@ function setupEventListeners() {
     const el = (id) => document.getElementById(id);
 
     el('runBtn').onclick = () => {
-        state.isRunning = !state.isRunning;
+
+	if (!state.isRunning) drawGrid();	
+
+	state.isRunning = !state.isRunning;
         state.isRunning ? startMonitoring() : stopMonitoring();
-	drawGrid();	
         updateUIStates();
     };
 

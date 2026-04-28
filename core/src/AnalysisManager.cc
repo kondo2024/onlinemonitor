@@ -7,10 +7,11 @@
 #include "CoinAnalyzer.hh"
 #include "PlasticAnalyzer.hh"
 #include "HODAnalyzer.hh"
-#include "NEBULAAnalyzer.hh"
 #include "BDCAnalyzer.hh"
 #include "FDC1Analyzer.hh"
 #include "FDC2Analyzer.hh"
+#include "NEBULAAnalyzer.hh"
+#include "NINJAAnalyzer.hh"
 
 #include <TArtEventStore.hh>
 #include <TSystem.h>
@@ -55,6 +56,7 @@ bool AnalysisManager::Initialize() {
       else if (name_ts == "BDC")     fAnalyzers.push_back(new BDCAnalyzer(name));
       else if (name_ts == "FDC1")    fAnalyzers.push_back(new FDC1Analyzer(name));
       else if (name_ts == "FDC2")    fAnalyzers.push_back(new FDC2Analyzer(name));
+      else if (name_ts == "NINJA")   fAnalyzers.push_back(new NINJAAnalyzer(name));
       else if (name_ts == "TEST")    fAnalyzers.push_back(new TestAnalyzer(name));
       else {
 	std::cerr<<"[AnalysisManager] Error: unknown analyzer="<<name<<" in config.json"<<std::endl;

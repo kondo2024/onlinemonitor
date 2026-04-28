@@ -1,6 +1,6 @@
 { 
     "analyzer": {
-        "list": ["Test", "Coin", "Plastic", "BDC", "FDC1", "FDC2", "HOD", "NEBULA"],
+        "list": ["Test", "Coin", "Plastic", "BDC", "FDC1", "FDC2", "HOD", "NEBULA", "NINJA"],
 	"dc_tdc_file": "aaaa.root",
 	"z_bdc1": -2000,
 	"z_bdc2": -1000,

@@ -47,12 +47,13 @@ bool AnalysisManager::Initialize() {
       TString name_ts(name);
       name_ts.ToUpper();
       
-      if      (name_ts == "PLASTIC") fAnalyzers.push_back(new PlasticAnalyzer(name));
+      if      (name_ts == "COIN")    fAnalyzers.push_back(new CoinAnalyzer(name));
+      else if (name_ts == "PLASTIC") fAnalyzers.push_back(new PlasticAnalyzer(name));
       else if (name_ts == "HOD")     fAnalyzers.push_back(new HODAnalyzer(name));
       else if (name_ts == "NEBULA")  fAnalyzers.push_back(new NEBULAAnalyzer(name));
       else if (name_ts == "BDC")     fAnalyzers.push_back(new BDCAnalyzer(name));
-      else if (name_ts == "FDC1")     fAnalyzers.push_back(new FDC1Analyzer(name));
-      else if (name_ts == "FDC2")     fAnalyzers.push_back(new FDC2Analyzer(name));
+      else if (name_ts == "FDC1")    fAnalyzers.push_back(new FDC1Analyzer(name));
+      else if (name_ts == "FDC2")    fAnalyzers.push_back(new FDC2Analyzer(name));
       else if (name_ts == "TEST")    fAnalyzers.push_back(new TestAnalyzer(name));
       else {
 	std::cerr<<"[AnalysisManager] Error: unknown analyzer="<<name<<" in config.json"<<std::endl;

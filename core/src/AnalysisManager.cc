@@ -4,6 +4,7 @@
 #include "DisplayOutput.hh"
 #include "HttpOutput.hh"
 #include "TestAnalyzer.hh"
+#include "CoinAnalyzer.hh"
 #include "PlasticAnalyzer.hh"
 #include "HODAnalyzer.hh"
 #include "NEBULAAnalyzer.hh"

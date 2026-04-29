@@ -10,7 +10,8 @@ A real-time visualization tool using ANAROOT, ROOT-THttpServer and JSROOT.
 * JSROOT (compatible with ver 7.10.3)
 
 ## Installation
-1. 
+You can skip 1-3 if you install sm_online_utils.
+1. download
 ```
 git clone --recursive https://github.com/kondo2024/onlinemonitor.git
 ```
@@ -38,6 +39,7 @@ online_monitor
 ### online mode
 * Main UI: http://server:8080/web/index.html
 * simple UI is also available at: http://server:8080
+replace "server" for your system.
 
 Load specific configuration json file (online, canvas mode).
 ```
@@ -77,6 +79,6 @@ Click Canvas, then keyboard control will be available.
 
 ## To do
 - classify histograms by TFolder
-- BDCAnalyzer, FDCAnalyzer, PPACAnalyzer
+- PPACAnalyzer
 - BeamFocusAnalyzer and its parameters (relative positions) in json
 

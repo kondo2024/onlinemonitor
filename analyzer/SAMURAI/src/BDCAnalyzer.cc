@@ -236,7 +236,7 @@ void BDCAnalyzer::ClearData() {
 //--------------------------------------------------------
 bool BDCAnalyzer::LoadDCTDCDistribution() {
   auto config = ConfigManager::GetInstance()->GetJson();
-  if (config.contains("analysis") && config["analyzer"].contains("dc_tdc_file")){
+  if (config.contains("analyzer") && config["analyzer"].contains("dc_tdc_file")){
     fTDCDistFileName = config["analyzer"]["dc_tdc_file"];
   }else{
     std::cout << "\e[35m " << "Define dc_tdc_file in config.json, if you need tracking " << "\e[0m" << std::endl;

@@ -105,8 +105,8 @@ void FDC2Analyzer::ClearData() {
 //--------------------------------------------------------
 bool FDC2Analyzer::LoadDCTDCDistribution() {
   auto config = ConfigManager::GetInstance()->GetJson();
-  if (config.contains("analysis") && config["analysis"].contains("dc_tdc_file")){
-    fTDCDistFileName = config["analysis"]["dc_tdc_file"];
+  if (config.contains("analyzer") && config["analyzer"].contains("dc_tdc_file")){
+    fTDCDistFileName = config["analyzer"]["dc_tdc_file"];
   } else {
     std::cout << "\e[35m Define dc_tdc_file in config.json for FDC2 tracking \e[0m" << std::endl;
     return false;

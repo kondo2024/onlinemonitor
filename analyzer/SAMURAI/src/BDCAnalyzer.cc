@@ -56,9 +56,9 @@ bool BDCAnalyzer::Init(){
   fhtgt_xy = hm->BookTH2("TGT_xy","Target XY;X;Y",
 			 100,-80,80, 100,-80,80,"BDC");
   fhtgt_xa = hm->BookTH2("TGT_xa","Target XA;X;A",
-			 100,-80,80, 100,-0.1,0.1,"BDC");
+			 100,-80,80, 100,-0.05,0.05,"BDC");
   fhtgt_yb = hm->BookTH2("TGT_yb","Target YB;Y;B",
-			 100,-80,80, 100,-0.1,0.1,"BDC");
+			 100,-80,80, 100,-0.05,0.05,"BDC");
 
 
   // load relative positions

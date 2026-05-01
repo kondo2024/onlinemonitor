@@ -39,10 +39,10 @@ bool FDC2Analyzer::Init(){
                           100,-1200,1200, 100,-600,600,"FDC2");
 
   fhfdc2_xa = hm->BookTH2("FDC2_xa","FDC2 XA;X;A",
-                          100,-1200,1200, 100,-1,1,"FDC2");
+                          100,-1200,1200, 100,-0.5,0.5,"FDC2");
 
   fhfdc2_yb = hm->BookTH2("FDC2_yb","FDC2 YB;X;B",
-                          100,-1200,1200, 100,-1,1,"FDC2");
+                          100,-1200,1200, 100,-0.5,0.5,"FDC2");
 
   return true;
 }

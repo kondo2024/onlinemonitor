@@ -41,8 +41,16 @@ protected:
 
   TH1* fhbdc1_xy;
   TH1* fhbdc2_xy;
+  TH1* fhtgt_xy;
+  TH1* fhtgt_xa;
+  TH1* fhtgt_yb;
 
   bool fDoTracking = true;
+
+  double fZ_BDC1 = -2000;
+  double fZ_BDC2 = -1000;
+  double fZ_TGT = 0;
+
 };
 
 #endif

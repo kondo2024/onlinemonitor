@@ -53,6 +53,22 @@ bool BDCAnalyzer::Init(){
   fhbdc2_xy = hm->BookTH2("BDC2_xy","BDC2 XY;X;Y",
 			  100,-80,80, 100,-80,80,"BDC");
 
+  fhtgt_xy = hm->BookTH2("TGT_xy","Target XY;X;Y",
+			 100,-80,80, 100,-80,80,"BDC");
+  fhtgt_xa = hm->BookTH2("TGT_xa","Target XA;X;A",
+			 100,-80,80, 100,-0.1,0.1,"BDC");
+  fhtgt_yb = hm->BookTH2("TGT_yb","Target YB;Y;B",
+			 100,-80,80, 100,-0.1,0.1,"BDC");
+
+
+  // load relative positions
+  auto config = ConfigManager::GetInstance()->GetJson();
+
+  if (config.contains("analyzer")){
+    if (config["analyzer"].contains("z_bdc1") )   fZ_BDC1 = config["analyzer"]["z_bdc1"];
+    if (config["analyzer"].contains("z_bdc2") )   fZ_BDC2 = config["analyzer"]["z_bdc2"];
+    if (config["analyzer"].contains("z_target") ) fZ_TGT  = config["analyzer"]["z_target"];
+  }
   
   return true;
 }
@@ -100,6 +116,11 @@ void BDCAnalyzer::Fill() {
   Double_t BDC1_Y=-9999;
   Double_t BDC2_X=-9999;
   Double_t BDC2_Y=-9999;
+  Bool_t IsOK_BDC1X = false;
+  Bool_t IsOK_BDC1Y = false;
+  Bool_t IsOK_BDC2X = false;
+  Bool_t IsOK_BDC2Y = false;
+  
   // BDC1 Track
   TClonesArray *BDC1Tracks = fCalibBDC1Track->GetDCTrackArray();
   
@@ -137,7 +158,9 @@ void BDCAnalyzer::Fill() {
       }
 
     //std::cout<<fBDC1_X<<" "<<fBDC1_Y<<std::endl;
-      fhbdc1_xy->Fill(BDC1_X,BDC1_Y); 
+      fhbdc1_xy->Fill(BDC1_X,BDC1_Y);
+      if(BDC1_X>-9000) IsOK_BDC1X = true;
+      if(BDC1_Y>-9000) IsOK_BDC1Y = true;
     }  
   }
 
@@ -178,10 +201,30 @@ void BDCAnalyzer::Fill() {
       }
 
       fhbdc2_xy->Fill(BDC2_X,BDC2_Y);  
-
+      if(BDC2_X>-9000) IsOK_BDC2X = true;
+      if(BDC2_Y>-9000) IsOK_BDC2Y = true;
     }      
   }
 
+  // target image
+  Double_t TGTX=-9999;
+  Double_t TGTY=-9999;
+  Double_t TGTA=-9999;
+  Double_t TGTB=-9999;
+
+  if (IsOK_BDC1X && IsOK_BDC2X){
+    TGTA = (BDC2_X - BDC1_X)/(fZ_BDC2 - fZ_BDC1);
+    TGTX = BDC2_X + TGTA*(fZ_TGT-fZ_BDC2);
+  }
+  if (IsOK_BDC1Y && IsOK_BDC2Y){
+    TGTB = (BDC2_Y - BDC1_Y)/(fZ_BDC2 - fZ_BDC1);
+    TGTY = BDC2_Y + TGTB*(fZ_TGT-fZ_BDC2);
+  }
+
+  fhtgt_xy->Fill(TGTX,TGTY);
+  fhtgt_xa->Fill(TGTX,TGTA);
+  fhtgt_yb->Fill(TGTY,TGTB);
+  
 }
 //--------------------------------------------------------
 void BDCAnalyzer::ClearData() {

@@ -44,6 +44,7 @@ protected:
   TH1* fhtgt_xy;
   TH1* fhtgt_xa;
   TH1* fhtgt_yb;
+  TH1* fhtgt_zx;
 
   bool fDoTracking = true;
 

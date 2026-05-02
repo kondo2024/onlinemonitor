@@ -41,7 +41,7 @@ bool BDCAnalyzer::Init(){
 			     128,0.5,128.5,100,0,500,"BDC");
 
   fhbdc1_xy = hm->BookTH2("BDC1_xy","BDC1 XY;X;Y",
-			  100,-80,80, 100,-80,80,"BDC");
+			  100,-50,50, 100,-50,50,"BDC");
 
   fhbdc2_idtt = hm->BookTH2("BDC2_idtt","BDC2 ID-T(trailing);ID;T(trailing)",
 			    128,0.5,128.5,100,0,3000,"BDC");
@@ -51,14 +51,16 @@ bool BDCAnalyzer::Init(){
 			     128,0.5,128.5,100,0,500,"BDC");
 
   fhbdc2_xy = hm->BookTH2("BDC2_xy","BDC2 XY;X;Y",
-			  100,-80,80, 100,-80,80,"BDC");
+			  100,-50,50, 100,-50,50,"BDC");
 
-  fhtgt_xy = hm->BookTH2("TGT_xy","Target XY;X;Y",
+  fhtgt_xy = hm->BookTH2("TGT_xy","Target XY;X(+:ZDS side);Y(+:up)",
 			 100,-80,80, 100,-80,80,"BDC");
   fhtgt_xa = hm->BookTH2("TGT_xa","Target XA;X;A",
 			 100,-80,80, 100,-0.05,0.05,"BDC");
   fhtgt_yb = hm->BookTH2("TGT_yb","Target YB;Y;B",
 			 100,-80,80, 100,-0.05,0.05,"BDC");
+  fhtgt_zx = hm->BookTH2("BDCTGT_zx","BDC1,2,Target ZX;Z;X(+:ZDS side)",
+			 100,-3000,500, 100,-80,80,"BDC");
 
 
   // load relative positions
@@ -224,6 +226,11 @@ void BDCAnalyzer::Fill() {
   fhtgt_xy->Fill(TGTX,TGTY);
   fhtgt_xa->Fill(TGTX,TGTA);
   fhtgt_yb->Fill(TGTY,TGTB);
+
+  //entries are 3 times larger
+  fhtgt_zx->Fill(fZ_BDC1, BDC1_X);
+  fhtgt_zx->Fill(fZ_BDC2, BDC2_X);
+  fhtgt_zx->Fill(fZ_TGT, TGTX);
   
 }
 //--------------------------------------------------------

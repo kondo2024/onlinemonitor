@@ -1,6 +1,6 @@
 { 
     "analyzer": {
-        "list": ["Test", "Coin", "Plastic", "BDC", "FDC1", "FDC2", "HOD", "NEBULA", "NINJA"],
+        "list": ["Coin", "Plastic", "BDC", "FDC1", "FDC2", "HOD", "NEBULA", "NINJA"],
 	"dc_tdc_file": "aaaa.root",
 	"z_bdc1": -2000,
 	"z_bdc2": -1000,
@@ -23,5 +23,5 @@
 	"auto_save": true,
 	"save_interval_minutes": 10
     },
-    "http_port": 8080
+    "http_port": 10101
 }

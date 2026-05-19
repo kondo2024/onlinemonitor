@@ -37,8 +37,8 @@ source install/bin/setup_onlinemonitor.sh
 online_monitor
 ```
 ### online mode
-* Main UI: http://server:8080/web/index.html
-* simple UI is also available at: http://server:8080
+* Main UI: http://server:10101/web/index.html
+* simple UI is also available at: http://server:10101
 replace "server" for your system.
 
 Load specific configuration json file (online, canvas mode).
@@ -60,7 +60,7 @@ Click Canvas, then keyboard control will be available.
 | analyzers       | String list of analyzer class names to be instantiated|
 | hist_range_file | Path to the JSON file defining histogram binning and ranges, should be located at the same dir as config.json|
 | skip_histograms | String list of histogram names to be excluded in the display|
-| http_port| TCP port number for the THttpServer (default: 8080)|
+| http_port| TCP port number for the THttpServer (default: 10101)|
 | auto_reset       | If true, all histogram statistics will be cleared automatically when the event count reaches the threshold|
 | auto_reset_events| The threshold of event entries for the auto-reset|
 

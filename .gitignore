@@ -6,3 +6,5 @@ build/*
 install/*
 *.root
 web/jsroot-*
+config/config.json
+config/hist_ranges.json

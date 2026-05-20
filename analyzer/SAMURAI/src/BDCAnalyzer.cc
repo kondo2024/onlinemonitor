@@ -71,7 +71,7 @@ bool BDCAnalyzer::Init(){
   fhtof713q13_bpid = hm->BookTH2("BPID_tof713q13_bpid","Beam PID TOF713 Q13 gated;TOF713;Q13",
 				 100,0,2000, 100,0,4000,"BeamPID");
   
-  fhtgt_xy_bpid = hm->BookTH2("TGT_xy_ bpid","Target XY BeamPID;X(+:ZDS side);Y(+:up)",
+  fhtgt_xy_bpid = hm->BookTH2("TGT_xy_bpid","Target XY BeamPID;X(+:ZDS side);Y(+:up)",
 			      100,-80,80, 100,-80,80,"BDC");
   fhtgt_xa_bpid = hm->BookTH2("TGT_xa_bpid","Target XA BeamPID;X;A",
 			 100,-80,80, 100,-0.05,0.05,"BDC");

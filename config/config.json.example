@@ -1,7 +1,7 @@
 { 
     "analyzer": {
         "list": ["Coin", "Plastic", "BDC", "FDC1", "FDC2", "HOD", "NEBULA", "NINJA"],
-	"dc_tdc_file": "aaaa.root",
+	"dc_tdc_file": "db/dc/tdcdists_run1198.root",
 	"z_bdc1": -2000,
 	"z_bdc2": -1000,
 	"z_target": 0,

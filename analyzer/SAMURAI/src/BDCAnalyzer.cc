@@ -246,7 +246,9 @@ void BDCAnalyzer::Fill() {
   fhtgt_yb->Fill(TGTY,TGTB);
 
   fhtgt_x->Fill(TGTX);
+  fhtgt_y->Fill(TGTY);
   if (fhtgt_x->GetEntries()>10) fhtgt_x->Fit("gaus","Q");
+  if (fhtgt_y->GetEntries()>10) fhtgt_y->Fit("gaus","Q");
 
   //entries are 3 times larger
   fhtgt_zx->Fill(fZ_BDC1, BDC1_X);
@@ -309,6 +311,12 @@ void BDCAnalyzer::Fill() {
     fhtgt_xy_bpid->Fill(TGTX,TGTY);
     fhtgt_xa_bpid->Fill(TGTX,TGTA);
     fhtgt_yb_bpid->Fill(TGTY,TGTB);
+
+    fhtgt_x_bpid->Fill(TGTX);
+    fhtgt_y_bpid->Fill(TGTY);
+    if (fhtgt_x_bpid->GetEntries()>10) fhtgt_x_bpid->Fit("gaus","Q");
+    if (fhtgt_y_bpid->GetEntries()>10) fhtgt_y_bpid->Fit("gaus","Q");
+
   }
   
 }

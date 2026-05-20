@@ -53,6 +53,8 @@ protected:
   TH1* fhtgt_xy_bpid;
   TH1* fhtgt_xa_bpid;
   TH1* fhtgt_yb_bpid;
+  TH1* fhtgt_x_bpid;
+  TH1* fhtgt_y_bpid;
   TH1* fhtgt_zx_bpid;
 
   bool fDoTracking = true;

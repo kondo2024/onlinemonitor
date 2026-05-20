@@ -31,8 +31,10 @@ public:
   void ReconstructData() override {}
   void Fill() override {
     //for (int i=0;i<10;++i)
-    for (int i=0;i<1;++i)
+    for (int i=0;i<1;++i){
       hTest[i]->Fill(rand()%100 + i*10);
+      if (hTest[i]->GetEntries()>10) hTest[i]->Fit("gaus","Q");
+    }
 
     hTest[10]->Fill(rand()%100,rand()%100);
     

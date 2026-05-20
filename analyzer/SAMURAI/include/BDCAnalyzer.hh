@@ -44,6 +44,8 @@ protected:
   TH1* fhtgt_xy;
   TH1* fhtgt_xa;
   TH1* fhtgt_yb;
+  TH1* fhtgt_x;
+  TH1* fhtgt_y;
   TH1* fhtgt_zx;
 
   TH1* fhtof713q13;

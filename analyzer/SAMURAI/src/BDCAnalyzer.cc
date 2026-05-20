@@ -61,6 +61,8 @@ bool BDCAnalyzer::Init(){
 			 100,-80,80, 100,-0.05,0.05,"BDC");
   fhtgt_yb = hm->BookTH2("TGT_yb","Target YB;Y;B",
 			 100,-80,80, 100,-0.05,0.05,"BDC");
+  fhtgt_x = hm->BookTH1("TGT_x","Target X;X(+:ZDS side);Counts",
+			100,-80,80, "BDC");
   fhtgt_zx = hm->BookTH2("BDCTGT_zx","BDC1,2,Target ZX;Z;X(+:ZDS side)",
 			 100,-3000,500, 100,-80,80,"BDC");
 
@@ -242,6 +244,9 @@ void BDCAnalyzer::Fill() {
   fhtgt_xy->Fill(TGTX,TGTY);
   fhtgt_xa->Fill(TGTX,TGTA);
   fhtgt_yb->Fill(TGTY,TGTB);
+
+  fhtgt_x->Fill(TGTX);
+  if (fhtgt_x->GetEntries()>10) fhtgt_x->Fit("gaus","Q");
 
   //entries are 3 times larger
   fhtgt_zx->Fill(fZ_BDC1, BDC1_X);

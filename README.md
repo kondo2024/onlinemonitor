@@ -33,9 +33,12 @@ cp hist_ranges.json.example hist_ranges.json
 
 ## Quick Usage
 ```
+tmux new -s onlinemonitor (or tmux a -t onlinemonitor)
 source install/bin/setup_onlinemonitor.sh
 online_monitor
 ```
+To detach tmux session, Ctrl-b d
+
 ### online mode
 * Main UI: http://server:10101/web/index.html
 * simple UI is also available at: http://server:10101

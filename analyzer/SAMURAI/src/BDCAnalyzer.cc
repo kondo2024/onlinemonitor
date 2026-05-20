@@ -63,6 +63,8 @@ bool BDCAnalyzer::Init(){
 			 100,-80,80, 100,-0.05,0.05,"BDC");
   fhtgt_x = hm->BookTH1("TGT_x","Target X;X(+:ZDS side);Counts",
 			100,-80,80, "BDC");
+  fhtgt_y = hm->BookTH1("TGT_y","Target Y;Y(+:ZDS side);Counts",
+			100,-80,80, "BDC");
   fhtgt_zx = hm->BookTH2("BDCTGT_zx","BDC1,2,Target ZX;Z;X(+:ZDS side)",
 			 100,-3000,500, 100,-80,80,"BDC");
 
@@ -80,6 +82,11 @@ bool BDCAnalyzer::Init(){
   fhtgt_yb_bpid = hm->BookTH2("TGT_yb_bpid","Target YB BeamPID;Y;B",
 			 100,-80,80, 100,-0.05,0.05,"BDC");
 
+  fhtgt_x_bpid = hm->BookTH1("TGT_x_bpid","Target X BeamPID;X(+:ZDS side);Counts",
+			     100,-80,80, "BDC");
+  fhtgt_y_bpid = hm->BookTH1("TGT_y_bpid","Target Y BeamPID;Y(+:ZDS side);Counts",
+			     100,-80,80, "BDC");
+  
   // load relative positions
   auto config = ConfigManager::GetInstance()->GetJson();
 

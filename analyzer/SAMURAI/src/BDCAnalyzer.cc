@@ -66,10 +66,10 @@ bool BDCAnalyzer::Init(){
 
 
   fhtof713q13 = hm->BookTH2("BPID_tof713q13","Beam PID TOF713 Q13;TOF713;Q13",
-			    100,-80,80, 100,0,1000,"BeamPID");
+			    100,0,2000, 100,0,4000,"BeamPID");
   
   fhtof713q13_bpid = hm->BookTH2("BPID_tof713q13_bpid","Beam PID TOF713 Q13 gated;TOF713;Q13",
-				 100,-80,80, 100,0,1000,"BeamPID");
+				 100,0,2000, 100,0,4000,"BeamPID");
   
   fhtgt_xy_bpid = hm->BookTH2("TGT_xy_ bpid","Target XY BeamPID;X(+:ZDS side);Y(+:up)",
 			      100,-80,80, 100,-80,80,"BDC");
@@ -266,7 +266,7 @@ void BDCAnalyzer::Fill() {
   auto config = ConfigManager::GetInstance()->GetJson();
   if (config.contains("analyzer")){
     if (config["analyzer"].contains("pid_tof713_low") ) pid_tof713_low = config["analyzer"]["pid_tof713_low"];
-    if (config["analyzer"].contains("pid_tof713_high") ) pid_tof713_low = config["analyzer"]["pid_tof713_high"];
+    if (config["analyzer"].contains("pid_tof713_high") ) pid_tof713_high = config["analyzer"]["pid_tof713_high"];
     if (config["analyzer"].contains("pid_q13_low") ) pid_q13_low = config["analyzer"]["pid_q13_low"];
     if (config["analyzer"].contains("pid_q13_high") ) pid_q13_high = config["analyzer"]["pid_q13_high"];
   }
@@ -296,7 +296,7 @@ void BDCAnalyzer::Fill() {
   fhtof713q13->Fill(tof713, q13);
 
   if (pid_tof713_low < tof713 && tof713 < pid_tof713_high &&
-      pid_q13_low < q13 && pid_q13_high < q13 ) OK_BeamPID = true;
+      pid_q13_low < q13 && q13 < pid_q13_high ) OK_BeamPID = true;
 
   
   if (OK_BeamPID){

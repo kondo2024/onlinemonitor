@@ -4,7 +4,11 @@
 	"dc_tdc_file": "aaaa.root",
 	"z_bdc1": -2000,
 	"z_bdc2": -1000,
-	"z_target": 0
+	"z_target": 0,
+	"pid_tof713_low":-2000,
+	"pid_tof713_high":2000,
+	"pid_q13_low":0,
+	"pid_q13_high":1000
     },	  
     "hist_range_file": "config/hist_ranges.json",
     "skip_histograms":[

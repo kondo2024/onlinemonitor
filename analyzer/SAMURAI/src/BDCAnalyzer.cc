@@ -6,6 +6,7 @@
 #include "TArtCalibBDC2Hit.hh"
 #include "TArtCalibBDC1Track.hh"
 #include "TArtCalibBDC2Track.hh"
+#include "TArtStoreManager.hh"
 
 #include "TArtDCHit.hh"
 #include "TArtDCTrack.hh"
@@ -62,6 +63,19 @@ bool BDCAnalyzer::Init(){
   fhtgt_zx = hm->BookTH2("BDCTGT_zx","BDC1,2,Target ZX;Z;X(+:ZDS side)",
 			 100,-3000,500, 100,-80,80,"BDC");
 
+
+  fhtof713q13 = hm->BookTH2("BPID_tof713q13","Beam PID TOF713 Q13;TOF713;Q13",
+			    100,-80,80, 100,0,1000,"BeamPID");
+  
+  fhtof713q13_bpid = hm->BookTH2("BPID_tof713q13_bpid","Beam PID TOF713 Q13 gated;TOF713;Q13",
+				 100,-80,80, 100,0,1000,"BeamPID");
+  
+  fhtgt_xy_bpid = hm->BookTH2("TGT_xy_ bpid","Target XY BeamPID;X(+:ZDS side);Y(+:up)",
+			      100,-80,80, 100,-80,80,"BDC");
+  fhtgt_xa_bpid = hm->BookTH2("TGT_xa_bpid","Target XA BeamPID;X;A",
+			 100,-80,80, 100,-0.05,0.05,"BDC");
+  fhtgt_yb_bpid = hm->BookTH2("TGT_yb_bpid","Target YB BeamPID;Y;B",
+			 100,-80,80, 100,-0.05,0.05,"BDC");
 
   // load relative positions
   auto config = ConfigManager::GetInstance()->GetJson();
@@ -208,6 +222,7 @@ void BDCAnalyzer::Fill() {
     }      
   }
 
+  //----------------------------------
   // target image
   Double_t TGTX=-9999;
   Double_t TGTY=-9999;
@@ -231,6 +246,33 @@ void BDCAnalyzer::Fill() {
   fhtgt_zx->Fill(fZ_BDC1, BDC1_X);
   fhtgt_zx->Fill(fZ_BDC2, BDC2_X);
   fhtgt_zx->Fill(fZ_TGT, TGTX);
+
+  //----------------------------------
+  // beam focus check with pid by plastics
+  bool OK_BeamPID = false;
+  Double_t pid_tof713_low = 0;
+  Double_t pid_tof713_high = 0;
+  Double_t pid_q13_low = 0;
+  Double_t pid_q13_high = 0;
+  auto config = ConfigManager::GetInstance()->GetJson();
+  if (config.contains("analyzer")){
+    if (config["analyzer"].contains("pid_tof713_low") ) pid_tof713_low = config["analyzer"]["pid_tof713_low"];
+    if (config["analyzer"].contains("pid_tof713_high") ) pid_tof713_low = config["analyzer"]["pid_tof713_high"];
+    if (config["analyzer"].contains("pid_q13_low") ) pid_q13_low = config["analyzer"]["pid_q13_low"];
+    if (config["analyzer"].contains("pid_q13_high") ) pid_q13_high = config["analyzer"]["pid_q13_high"];
+  }
+
+  TArtStoreManager *sman = TArtStoreManager::Instance();
+  TClonesArray* pla_array = (TClonesArray *)sman->FindDataContainer("BigRIPSPlastic");
+
+
+  // kokoni kaku
+  
+  if (OK_BeamPID){
+    fhtgt_xy_bpid->Fill(TGTX,TGTY);
+    fhtgt_xa_bpid->Fill(TGTX,TGTA);
+    fhtgt_yb_bpid->Fill(TGTY,TGTB);
+  }
   
 }
 //--------------------------------------------------------

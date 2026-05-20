@@ -46,6 +46,13 @@ protected:
   TH1* fhtgt_yb;
   TH1* fhtgt_zx;
 
+  TH1* fhtof713q13;
+  TH1* fhtof713q13_bpid;
+  TH1* fhtgt_xy_bpid;
+  TH1* fhtgt_xa_bpid;
+  TH1* fhtgt_yb_bpid;
+  TH1* fhtgt_zx_bpid;
+
   bool fDoTracking = true;
 
   double fZ_BDC1 = -2000;

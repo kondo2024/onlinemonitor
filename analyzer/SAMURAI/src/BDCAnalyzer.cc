@@ -7,6 +7,7 @@
 #include "TArtCalibBDC1Track.hh"
 #include "TArtCalibBDC2Track.hh"
 #include "TArtStoreManager.hh"
+#include "TArtPlastic.hh"
 
 #include "TArtDCHit.hh"
 #include "TArtDCTrack.hh"
@@ -249,6 +250,14 @@ void BDCAnalyzer::Fill() {
 
   //----------------------------------
   // beam focus check with pid by plastics
+
+  TArtStoreManager *sman = TArtStoreManager::Instance();
+  TClonesArray* pla_array = (TClonesArray *)sman->FindDataContainer("BigRIPSPlastic");
+  if (pla_array==NULL){
+    std::cout<<"onlinemonitor: Please include Plastic in config.json for PID at BDCAnalyzer"<<std::endl;
+    return;
+  }
+
   bool OK_BeamPID = false;
   Double_t pid_tof713_low = 0;
   Double_t pid_tof713_high = 0;
@@ -262,13 +271,36 @@ void BDCAnalyzer::Fill() {
     if (config["analyzer"].contains("pid_q13_high") ) pid_q13_high = config["analyzer"]["pid_q13_high"];
   }
 
-  TArtStoreManager *sman = TArtStoreManager::Instance();
-  TClonesArray* pla_array = (TClonesArray *)sman->FindDataContainer("BigRIPSPlastic");
 
+  TArtPlastic *f7pla = nullptr;
+  TArtPlastic *f13pla1 = nullptr;
+  TArtPlastic *f13pla2 = nullptr;
+  
+  int npla = pla_array->GetEntries();
+  for (int i=0;i<npla;++i){
+    TArtPlastic *pla = (TArtPlastic*)pla_array->At(i);
+    int id = pla->GetID();
+    if      (id==3) f7pla   = pla;
+    else if (id==4) f13pla1 = pla;
+    else if (id==5) f13pla2 = pla;
+  }
 
-  // kokoni kaku
+  Double_t tof713 = -9999;
+  Double_t q13 = -1;
+
+  if (f7pla && f13pla1 && f13pla2){
+    tof713 = f7pla->GetTime() - 0.5*(f13pla1->GetTime() + f13pla2->GetTime());
+    q13 = f13pla2->GetQAveRaw();
+  }
+
+  fhtof713q13->Fill(tof713, q13);
+
+  if (pid_tof713_low < tof713 && tof713 < pid_tof713_high &&
+      pid_q13_low < q13 && pid_q13_high < q13 ) OK_BeamPID = true;
+
   
   if (OK_BeamPID){
+    fhtof713q13_bpid->Fill(tof713, q13);    
     fhtgt_xy_bpid->Fill(TGTX,TGTY);
     fhtgt_xa_bpid->Fill(TGTX,TGTA);
     fhtgt_yb_bpid->Fill(TGTY,TGTB);

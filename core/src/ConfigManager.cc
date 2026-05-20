@@ -32,6 +32,9 @@ bool ConfigManager::LoadConfig(const std::string& path) {
         nlohmann::json subJson;
         subIfs >> subJson;
         mainJson["ranges"] = std::move(subJson);
+      } else {
+	std::cout << "[ConfigManager] Error: Found 'hist_range_file' key, but CANNOT open sub-file: " 
+		  << subFilePath.string() << std::endl;
       }
     }
     

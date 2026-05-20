@@ -10,7 +10,7 @@
 	"pid_q13_low":0,
 	"pid_q13_high":1000
     },	  
-    "hist_range_file": "config/hist_ranges.json",
+    "hist_range_file": "hist_ranges.json",
     "skip_histograms":[
 	"hTest1"
     ],

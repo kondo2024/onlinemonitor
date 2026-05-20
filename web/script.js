@@ -145,7 +145,7 @@ async function drawGrid() {
 	
         try {
             const obj = await httpRequest(`/${path}/root.json`, "object");
-            if (obj) await redraw(divId, obj, "colz");
+            if (obj) await redraw(divId, obj, "colz;logz");
         } catch (e) {
             console.error(`Failed to draw ${path}:`, e);
             if (e.status === 404) {

@@ -99,5 +99,6 @@ curl "http://server:10101/SaveFigures/cmd.json"
 
 ## To do
 - classify histograms by TFolder
+- TOGAXSISiAnalyzer
 - PPACAnalyzer
 

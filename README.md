@@ -89,12 +89,12 @@ Click Canvas, then keyboard control will be available.
 #### communication by DAQ
 When a new run starts, call this. Then histograms are cleared.
 ```
-curl "http://localhost:10101/ResetAll/cmd.json"
+curl "http://server:10101/ResetAll/cmd.json"
 ```
 
 To save the figures use this.
 ```
-curl "http://localhost:10101/SaveFigures/cmd.json"
+curl "http://server:10101/SaveFigures/cmd.json"
 ```
 
 ## To do

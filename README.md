@@ -50,6 +50,8 @@ onlinemonitor online [config.json]
 ```
 (This may not work...)
 
+When you update the onlinemonitor and if it is not reflected on your display with browser, try Ctrl+F5.
+
 ### offline mode
 histograms are drawn in TCanvas. 
 ```

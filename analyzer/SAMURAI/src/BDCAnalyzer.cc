@@ -254,8 +254,8 @@ void BDCAnalyzer::Fill() {
 
   fhtgt_x->Fill(TGTX);
   fhtgt_y->Fill(TGTY);
-  if (fhtgt_x->GetEntries()>10) fhtgt_x->Fit("gaus","Q");
-  if (fhtgt_y->GetEntries()>10) fhtgt_y->Fit("gaus","Q");
+  if (fhtgt_x->Integral()>10) fhtgt_x->Fit("gaus","Q");
+  if (fhtgt_y->Integral()>10) fhtgt_y->Fit("gaus","Q");
 
   //entries are 3 times larger
   fhtgt_zx->Fill(fZ_BDC1, BDC1_X);
@@ -321,8 +321,8 @@ void BDCAnalyzer::Fill() {
 
     fhtgt_x_bpid->Fill(TGTX);
     fhtgt_y_bpid->Fill(TGTY);
-    if (fhtgt_x_bpid->GetEntries()>10) fhtgt_x_bpid->Fit("gaus","Q");
-    if (fhtgt_y_bpid->GetEntries()>10) fhtgt_y_bpid->Fit("gaus","Q");
+    if (fhtgt_x_bpid->Integral()>10) fhtgt_x_bpid->Fit("gaus","Q");
+    if (fhtgt_y_bpid->Integral()>10) fhtgt_y_bpid->Fit("gaus","Q");
 
   }
   
@@ -376,6 +376,8 @@ bool BDCAnalyzer::LoadDCTDCDistribution() {
       else
       std::cout << "\e[35m " << "Warning LoadTDCDistribution :: Could not find the following histogram " << Form("hbdc2tdc%d",i) << "\e[0m" << std::endl;
     }
+    RootFile->Close();
+    
   }else{
     fDoTracking = false;
     std::cout << "\e[35m " << "Skip BDC tracking " << "\e[0m" << std::endl;    

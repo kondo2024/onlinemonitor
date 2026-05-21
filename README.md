@@ -35,7 +35,7 @@ cp hist_ranges.json.example hist_ranges.json
 ```
 tmux new -s onlinemonitor (or tmux a -t onlinemonitor)
 source install/bin/setup_onlinemonitor.sh
-online_monitor
+onlinemonitor
 ```
 To detach tmux session, Ctrl-b d
 
@@ -46,12 +46,14 @@ replace "server" for your system.
 
 Load specific configuration json file (online, canvas mode).
 ```
-online_monitor online [config.json]
+onlinemonitor online [config.json]
 ```
+(This may not work...)
+
 ### offline mode
 histograms are drawn in TCanvas. 
 ```
-online_monitor ridffile [config.json] (offline, canvas mode)
+onlinemonitor ridffile [config.json] (offline, canvas mode)
 ```
 Click Canvas, then keyboard control will be available.
 

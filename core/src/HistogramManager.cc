@@ -206,7 +206,8 @@ void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThresho
     fHistograms[i]->Draw();
 
     if (padIdx == padsPerPage || i == totalHists - 1) {
-      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".png";
+      //      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".png";
+      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".jpg";
       fFigSaveCanvas->SaveAs(filename.c_str());
           
       fFigSaveCanvas->Clear();

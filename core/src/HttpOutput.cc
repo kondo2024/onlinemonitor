@@ -37,7 +37,7 @@ bool HttpOutput::Initialize() {
   std::string http_root = std::string(home) + "/web/";
   std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
-    TString str = Form("http:%d",port);
+    TString str = Form("http:%d?thrds=50",port);
     fHttpServer = new THttpServer(str.Data());
   } catch (...) {
     std::cerr << "CRITICAL: Failed to allocate THttpServer" << std::endl;
@@ -99,11 +99,17 @@ void HttpOutput::SetupHttpCommands() {
   long long funcAddr = (long long)(void*)Internal_GlobalReset;
   TString code;
   code.Form(
-        "extern \"C\" void GlobalReset() { "
+        "extern \"C\" bool GlobalReset() { "
         "  auto f = (void (*)()) %lld; "
         "  if (f) f(); "
+	"  return true; "
         "}", funcAddr);
 
   gInterpreter->Declare(code.Data());
   fHttpServer->RegisterCommand("/ResetAll", "GlobalReset()");
+//  fHttpServer->SetItemField("/", "_all_methods_enabled", "true");
+//  fHttpServer->SetItemField("/", "_any_user_access", "true");
+//
+//  // for debug
+//  fHttpServer->RegisterCommand("ResetAll", "gSystem->GetFromPipe(\"echo 'hello'\")");
 }

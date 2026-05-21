@@ -11,6 +11,10 @@ extern "C" void Internal_GlobalReset() {
   HistogramManager::GetInstance()->RequestResetAll();
 }
 
+extern "C" void Internal_GlobalSaveFigures() {
+  HistogramManager::GetInstance()->SaveFigures(1,0);
+}
+
 HttpOutput::HttpOutput()
   : DisplayOutput(),
     fHttpServer(nullptr), fServerTimeStr(nullptr) {
@@ -96,20 +100,30 @@ void HttpOutput::RefreshServerTime() {
 void HttpOutput::SetupHttpCommands() {
   if (!fHttpServer) return;
 
+
+  // reset command
   long long funcAddr = (long long)(void*)Internal_GlobalReset;
   TString code;
   code.Form(
         "extern \"C\" bool GlobalReset() { "
-        "  auto f = (void (*)()) %lld; "
+        "  auto f = reinterpret_cast<void(*)()>(%lld); "
         "  if (f) f(); "
-	"  return true; "
+        "  return true; "
         "}", funcAddr);
-
   gInterpreter->Declare(code.Data());
   fHttpServer->RegisterCommand("/ResetAll", "GlobalReset()");
-//  fHttpServer->SetItemField("/", "_all_methods_enabled", "true");
-//  fHttpServer->SetItemField("/", "_any_user_access", "true");
-//
-//  // for debug
-//  fHttpServer->RegisterCommand("ResetAll", "gSystem->GetFromPipe(\"echo 'hello'\")");
+
+
+  // figure save
+  long long funcAddr2 = (long long)(void*)Internal_GlobalSaveFigures;
+  TString code2;
+  code2.Form(
+        "extern \"C\" bool GlobalSaveFigures() { "
+        "  auto f = reinterpret_cast<void(*)()>(%lld); "
+        "  if (f) f(); "
+        "  return true; "
+        "}", funcAddr2);
+  gInterpreter->Declare(code2.Data());
+  fHttpServer->RegisterCommand("/SaveFigures", "GlobalSaveFigures()");
 }
+

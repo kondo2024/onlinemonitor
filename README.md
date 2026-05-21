@@ -84,6 +84,19 @@ Click Canvas, then keyboard control will be available.
 | auto_save            | if true, figures(png) are automatically saved periodically in background |
 | save_interval_minutes| Time interval between each auto-save operation|
 
+## For developers
+
+#### communication by DAQ
+When a new run starts, call this. Then histograms are cleared.
+```
+curl "http://localhost:10101/ResetAll/cmd.json"
+```
+
+To save the figures use this.
+```
+curl "http://localhost:10101/SaveFigures/cmd.json"
+```
+
 ## To do
 - classify histograms by TFolder
 - PPACAnalyzer

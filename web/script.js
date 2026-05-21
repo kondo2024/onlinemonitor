@@ -54,6 +54,14 @@ function setupEventListeners() {
         updateUIStates();
     };
 
+    window.checkAllHistograms = function(isCheck) {
+	const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+	checkboxes.forEach(cb => {
+            cb.checked = isCheck;
+            cb.dispatchEvent(new Event('change'));
+	});
+    }
+    
     el('drawBtn').onclick = () => drawGrid();
 
     el('inputRows').value = state.settings.rows;

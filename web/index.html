@@ -12,6 +12,7 @@
 
 	<div id="status-bar" style="padding: 10px;">
 	  <button id="runBtn" style="width: 180px; padding: 5px 15px; border: none; cursor: pointer;">---</button>
+	  <br>
 	  Status:<br>
 	  <span id="status-info">----</span><BR>
 	  <span id="auto-reset-info">----</span><BR>
@@ -31,6 +32,11 @@
 	  Histograms
           <ul id="hist-list" style="list-style: none;"></ul>
 
+	  <div style="display: flex gap: 10px">
+	    <button type="button" onclick="checkAllHistograms(true)" style="width: 120px; padding: 5px 15px; border: none; cursor: pointer;">All Hists ON</button>
+	    <button type="button" onclick="checkAllHistograms(false)" style="width: 120px; padding: 5px 15px; border: none; cursor: pointer;">All Hists OFF</button>
+	  </div>
+
 	  <button id="resetBtn" style="flex: 1; width: 180px; padding: 5px 15px; border: none; cursor: pointer;">
             Reset histograms
 	  </button>
@@ -42,8 +48,6 @@
 	    </div>
 	    <div style="flex: 1;">
               Rows: <input type="number" id="inputRows" value="3" min="1" max="5" style="width: 40px;">
-	    </div>
-	    <div style="flex: 1;">
               Cols: <input type="number" id="inputCols" value="3" min="1" max="8" style="width: 40px;">
 	    </div>
 	    <div style="flex: 1;">

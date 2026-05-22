@@ -5,6 +5,7 @@
 #include <TNamed.h>
 #include <TInterpreter.h>
 #include <TSystem.h>
+#include <TStopwatch.h>
 #include <iostream>
 
 extern "C" void Internal_GlobalReset() {
@@ -42,6 +43,7 @@ bool HttpOutput::Initialize() {
   std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
     TString str = Form("http:%d?thrds=50",port);
+    //TString str = Form("http:%d?thrds=50&timer=100",port);
     fHttpServer = new THttpServer(str.Data());
   } catch (...) {
     std::cerr << "CRITICAL: Failed to allocate THttpServer" << std::endl;
@@ -86,7 +88,10 @@ void HttpOutput::RegisterEntries() {
 }
 
 void HttpOutput::Update() {
+  return; // for debug
+
   if (!fHttpServer) return;
+
   RefreshServerTime();
   gSystem->ProcessEvents();// accept http requests
 }

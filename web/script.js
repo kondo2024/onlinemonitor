@@ -58,7 +58,7 @@ function setupEventListeners() {
 	const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 	checkboxes.forEach(cb => {
             cb.checked = isCheck;
-            cb.dispatchEvent(new Event('change'));
+//            cb.dispatchEvent(new Event('change'));
 	});
     }
     

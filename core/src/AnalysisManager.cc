@@ -13,6 +13,7 @@
 #include "NEBULAAnalyzer.hh"
 #include "NINJAAnalyzer.hh"
 #include "HIMEVETOAnalyzer.hh"
+#include "TOGAXSISiAnalyzer.hh"
 
 #include <TArtEventStore.hh>
 #include <TSystem.h>
@@ -59,6 +60,7 @@ bool AnalysisManager::Initialize() {
       else if (name_ts == "FDC2")     fAnalyzers.push_back(new FDC2Analyzer(name));
       else if (name_ts == "NINJA")    fAnalyzers.push_back(new NINJAAnalyzer(name));
       else if (name_ts == "HIMEVETO") fAnalyzers.push_back(new HIMEVETOAnalyzer(name));
+      else if (name_ts == "TOGAXSISI") fAnalyzers.push_back(new TOGAXSISiAnalyzer(name));
       else if (name_ts == "TEST")     fAnalyzers.push_back(new TestAnalyzer(name));
       else {
 	std::cerr<<"[AnalysisManager] Error: unknown analyzer="<<name<<" in config.json"<<std::endl;
@@ -114,7 +116,10 @@ int AnalysisManager::ProcessEvent() {
   auto startAnalysis = std::chrono::steady_clock::now();
   while (std::chrono::steady_clock::now() - startAnalysis < std::chrono::milliseconds(anaPeriod)) {
 
-    if (!fEventStore->GetNextEvent()) return 1;
+    if (!fEventStore->GetNextEvent()) {
+      gSystem->Sleep(10);
+      return 1;
+    }
     for (auto analyzer : fAnalyzers) analyzer->ReconstructData();
     for (auto analyzer : fAnalyzers) analyzer->Fill();
     for (auto analyzer : fAnalyzers) analyzer->ClearData();
@@ -129,7 +134,8 @@ int AnalysisManager::ProcessEvent() {
   while (std::chrono::steady_clock::now() - startHttp < std::chrono::milliseconds(dispPeriod)) {
     fDispOutput->Update();
     gSystem->ProcessEvents();
-    gSystem->Sleep(1);
+    gSystem->Sleep(10);
+
   }
 
 

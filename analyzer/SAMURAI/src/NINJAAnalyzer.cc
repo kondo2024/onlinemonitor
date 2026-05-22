@@ -18,9 +18,9 @@ bool NINJAAnalyzer::Init(){
   HistogramManager* hm = HistogramManager::GetInstance();
 
   fhidlelu = hm->BookTH2("NINJA_idlelu","NINJA ID LELU",
-			 30,0.5,30.5,100,0,80000, "NINJA");
+			 30,0.5,30.5,100,0,50000, "NINJA");
   fhidlerd = hm->BookTH2("NINJA_idlerd","NINJA ID LERD",
-			 30,0.5,30.5,100,0,80000,"NINJA");
+			 30,0.5,30.5,100,0,50000,"NINJA");
   fhidtotlu = hm->BookTH2("NINJA_idtotlu","NINJA ID TOTLU",
 			  30,0.5,30.5,100,0,100, "NINJA");
   fhidtotrd = hm->BookTH2("NINJA_idtotrd","NINJA ID TOTRD",
@@ -50,8 +50,8 @@ void NINJAAnalyzer::Fill() {
     Double_t LERawRD = NINJA->fT_LERaw[1];
     Double_t TOTLU = NINJA->fTOTCal[0];
     Double_t TOTRD = NINJA->fTOTCal[1];
-    Double_t avgtime = (TOTLU + TOTRD)/2.;
-    Double_t avgTOT = pow(TOTLU * TOTRD,0.5);
+//    Double_t avgtime = (TOTLU + TOTRD)/2.;
+//    Double_t avgTOT = pow(TOTLU * TOTRD,0.5);
 
 
     fhidlelu->Fill(id,LERawLU);

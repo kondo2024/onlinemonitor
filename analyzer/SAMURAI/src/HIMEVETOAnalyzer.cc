@@ -22,9 +22,9 @@ bool HIMEVETOAnalyzer::Init(){
   fhidtl1 = hm->BookTH2("HIMEVETO_idtl1","HIMEVETO ID-Tleading1;ID;Tleading1",
 			3,0.5,3.5,100,0,100000,"HIMEVETO");
   fhidtot0 = hm->BookTH2("HIMEVETO_idtot0","HIMEVETO ID-TOT0;ID;TOT0",
-			 3,0.5,3.5,100,0,4000,"HIMEVETO");
+			 3,0.5,3.5,100,0,2000,"HIMEVETO");
   fhidtot1 = hm->BookTH2("HIMEVETO_idtot1","HIMEVETO ID-TOT1;ID;TOT1",
-			 3,0.5,3.5,100,0,4000,"HIMEVETO");
+			 3,0.5,3.5,100,0,2000,"HIMEVETO");
   return true;
 }
 //--------------------------------------------------------

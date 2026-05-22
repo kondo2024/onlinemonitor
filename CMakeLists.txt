@@ -26,7 +26,7 @@ else()
 endif()
 
 set(ANAROOT_LIBRARIES)
-foreach(_cpt anaroot anacore anabrips anasamurai XMLParser)
+foreach(_cpt anaroot anacore anabrips anasamurai anatogaxsi XMLParser)
   find_library(ANAROOT_${_cpt}_LIBRARY ${_cpt} $ENV{TARTSYS}/lib)
   if(ANAROOT_${_cpt}_LIBRARY)
     list(APPEND ANAROOT_LIBRARIES ${ANAROOT_${_cpt}_LIBRARY})
@@ -42,6 +42,7 @@ target_include_directories(onlinemonitor PRIVATE $ENV{TARTSYS}/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzer/base/include)
 target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzer/SAMURAI/include)
+target_include_directories(onlinemonitor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/analyzer/TOGAXSI/include)
 
 target_compile_definitions(onlinemonitor PRIVATE "USE_THREADS")
 

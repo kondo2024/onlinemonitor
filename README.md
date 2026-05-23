@@ -86,6 +86,9 @@ Click Canvas, then keyboard control will be available.
 
 ## For developers
 
+#### User plots
+If you want to include a specific plot for you experiment, modify UserAnalyzer.hh/.cc.
+
 #### communication by DAQ
 When a new run starts, call this. Then histograms are cleared.
 ```

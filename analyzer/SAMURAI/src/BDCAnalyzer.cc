@@ -45,9 +45,9 @@ bool BDCAnalyzer::Init(){
   fhbdc1_xy = hm->BookTH2("BDC1_xy","BDC1 XY;X;Y",
 			  100,-50,50, 100,-50,50,"BDC");
 
-  fhbdc2_idtt = hm->BookTH2("BDC2_idtt","BDC2 ID-T(trailing);ID;T(trailing)",
-			    128,0.5,128.5,100,0,3000,"BDC");
   fhbdc2_idtl = hm->BookTH2("BDC2_idtl","BDC2 ID-T(leading);ID;T(leading)",
+			    128,0.5,128.5,100,0,3000,"BDC");
+  fhbdc2_idtt = hm->BookTH2("BDC2_idtt","BDC2 ID-T(trailing);ID;T(trailing)",
 			    128,0.5,128.5,100,0,3000,"BDC");
   fhbdc2_idtot = hm->BookTH2("BDC2_idtot","BDC2 ID-ToT;ID;ToT",
 			     128,0.5,128.5,100,0,500,"BDC");

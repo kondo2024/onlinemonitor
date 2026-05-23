@@ -14,6 +14,7 @@
 #include "NINJAAnalyzer.hh"
 #include "HIMEVETOAnalyzer.hh"
 #include "TOGAXSISiAnalyzer.hh"
+#include "UserAnalyzer.hh"
 
 #include <TArtEventStore.hh>
 #include <TSystem.h>
@@ -61,6 +62,7 @@ bool AnalysisManager::Initialize() {
       else if (name_ts == "NINJA")    fAnalyzers.push_back(new NINJAAnalyzer(name));
       else if (name_ts == "HIMEVETO") fAnalyzers.push_back(new HIMEVETOAnalyzer(name));
       else if (name_ts == "TOGAXSISI") fAnalyzers.push_back(new TOGAXSISiAnalyzer(name));
+      else if (name_ts == "USER") fAnalyzers.push_back(new UserAnalyzer(name));
       else if (name_ts == "TEST")     fAnalyzers.push_back(new TestAnalyzer(name));
       else {
 	std::cerr<<"[AnalysisManager] Error: unknown analyzer="<<name<<" in config.json"<<std::endl;

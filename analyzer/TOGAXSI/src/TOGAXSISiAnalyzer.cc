@@ -2,6 +2,8 @@
 #include "HistogramManager.hh"
 #include "TArtTOGAXSIParameters.hh"
 #include "TArtCalibTOGAXSISi.hh"
+#include "TArtRecoTOGAXSIVertex.hh"
+#include "TArtTOGAXSIVertex.hh"
 #include "TArtTOGAXSISi.hh"
 #include <TH1.h>
 #include <TH2.h>
@@ -15,16 +17,28 @@ bool TOGAXSISiAnalyzer::Init(){
   if (!ret) return false;
 
   fCalibTOGAXSISi = new TArtCalibTOGAXSISi;
+  fRecoTOGAXSIVertex = new TArtRecoTOGAXSIVertex;
 
   HistogramManager* hm = HistogramManager::GetInstance();
 
   fhidstrip = hm->BookTH2("TOGAXSISi_idstrip","TOGAXSI Si ID stripID",
 			  20,0.5,20.5,200,0,1200, "TOGAXSI");
+
+  fhvxy   = hm->BookTH2("TOGAXSI_vxy","TOGAXSI Vertex XY;X;Y",
+			200,-50,50, 200,-50,50, "TOGAXSI");
+  fhvzx   = hm->BookTH2("TOGAXSI_vzx","TOGAXSI Vertex ZX;Z;X",
+			200,-200,200, 200,-50,50, "TOGAXSI");
+  fhvzy   = hm->BookTH2("TOGAXSI_vzy","TOGAXSI Vertex ZY;Z;Y",
+			200,-200,200, 200,-50,50, "TOGAXSI");
+  fhentvy = hm->BookTH2("TOGAXSI_entvy","TOGAXSI Entries VY;Entries;Y",
+			200,0,1.E+6, 200,-50,50, "TOGAXSI");
+  
   return true;
 }
 //--------------------------------------------------------
 void TOGAXSISiAnalyzer::ReconstructData() {
   fCalibTOGAXSISi->ReconstructData();
+  fRecoTOGAXSIVertex->ReconstructData();
 }
 //--------------------------------------------------------
 void TOGAXSISiAnalyzer::Fill() {
@@ -43,13 +57,40 @@ void TOGAXSISiAnalyzer::Fill() {
       Double_t stripid = si->GetStripID(j);
       fhidstrip->Fill(id,stripid);
     }
- 
- }
+  }
+
+  TClonesArray* vertex_array = (TClonesArray*)fRecoTOGAXSIVertex->GetTOGAXSIVertexArray();
+  Int_t nv = vertex_array->GetEntries();
+//  std::cout<<"TOGAXSISI: nv="<<nv<<std::endl;
+//  std::cout<<"TOGAXSISI: entries="<<&fEntries<<std::endl;
+  
+  for (int iv=0;iv<nv;++iv){
+    TArtTOGAXSIVertex *vertex = (TArtTOGAXSIVertex*)vertex_array->At(iv);
+    //Int_t ntr = vertex->GetNumOfTracks();
+    Int_t seg0 = vertex->GetSegment(0);
+    Int_t seg1 = vertex->GetSegment(1);
+    TVector3 pos = vertex->GetPosition();
+
+    if (seg0<5 && seg1>4){// Recoil/Cluster
+      fhvxy->Fill(pos.x(), pos.y());
+      fhvzx->Fill(pos.z(), pos.x());
+      fhvzy->Fill(pos.z(), pos.y());
+      if (fEntriesPtr) fhentvy->Fill(*fEntriesPtr,pos.y());
+    } else if (seg0>4 && seg1<5){// Cluster/Recoil
+      fhvxy->Fill(pos.x(), pos.y());
+      fhvzx->Fill(pos.z(), pos.x());
+      fhvzy->Fill(pos.z(), pos.y());
+      if (fEntriesPtr) fhentvy->Fill(*fEntriesPtr,pos.y());
+    }
+  }
+
+  
 
 }
 //--------------------------------------------------------
 void TOGAXSISiAnalyzer::ClearData() {
   fCalibTOGAXSISi->ClearData();
+  fRecoTOGAXSIVertex->ClearData();
 }
 //--------------------------------------------------------
 //--------------------------------------------------------

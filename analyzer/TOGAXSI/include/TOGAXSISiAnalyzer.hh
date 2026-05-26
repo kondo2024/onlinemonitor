@@ -6,6 +6,7 @@
 #include <string>
 
 class TArtCalibTOGAXSISi;
+class TArtRecoTOGAXSIVertex;
 class TH1;
 
 class TOGAXSISiAnalyzer : public BaseAnalyzer {
@@ -19,11 +20,21 @@ public:
   virtual void Fill() override;
   virtual void ClearData() override;
   
+  virtual void SetEntriesPtr(Long64_t *ptr){fEntriesPtr = ptr;}
+  
 protected:
   TArtCalibTOGAXSISi* fCalibTOGAXSISi = nullptr;
+  TArtRecoTOGAXSIVertex *fRecoTOGAXSIVertex = nullptr;
   TString fdbFileName = "db/TOGAXSISi.xml";
+
+  Long64_t *fEntriesPtr = nullptr;
   
   TH1* fhidstrip;
+
+  TH1* fhvxy;
+  TH1* fhvzx;
+  TH1* fhvzy;
+  TH1* fhentvy;
 };
 
 #endif

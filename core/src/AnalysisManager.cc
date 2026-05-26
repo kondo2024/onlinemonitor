@@ -61,7 +61,11 @@ bool AnalysisManager::Initialize() {
       else if (name_ts == "FDC2")     fAnalyzers.push_back(new FDC2Analyzer(name));
       else if (name_ts == "NINJA")    fAnalyzers.push_back(new NINJAAnalyzer(name));
       else if (name_ts == "HIMEVETO") fAnalyzers.push_back(new HIMEVETOAnalyzer(name));
-      else if (name_ts == "TOGAXSISI") fAnalyzers.push_back(new TOGAXSISiAnalyzer(name));
+      else if (name_ts == "TOGAXSISI") {
+	TOGAXSISiAnalyzer* togaxsisi_ana = new TOGAXSISiAnalyzer(name);
+	fAnalyzers.push_back(togaxsisi_ana);
+	togaxsisi_ana->SetEntriesPtr(&fEntries);
+      }
       else if (name_ts == "USER") fAnalyzers.push_back(new UserAnalyzer(name));
       else if (name_ts == "TEST")     fAnalyzers.push_back(new TestAnalyzer(name));
       else {

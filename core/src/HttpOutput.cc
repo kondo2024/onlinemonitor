@@ -13,7 +13,7 @@ extern "C" void Internal_GlobalReset() {
 }
 
 extern "C" void Internal_GlobalSaveFigures() {
-  HistogramManager::GetInstance()->SaveFigures(1,0);
+  HistogramManager::GetInstance()->RequestSaveFigures();
 }
 
 HttpOutput::HttpOutput()
@@ -42,8 +42,9 @@ bool HttpOutput::Initialize() {
   std::string http_root = std::string(home) + "/web/";
   std::cout<<"[HttpOutput] http root: "<<http_root<<std::endl;
   try {
+    //TString str = Form("http:%d",port);
+    //TString str = Form("http:%d?thrds=1",port);
     TString str = Form("http:%d?thrds=50",port);
-    //TString str = Form("http:%d?thrds=50&timer=100",port);
     fHttpServer = new THttpServer(str.Data());
   } catch (...) {
     std::cerr << "CRITICAL: Failed to allocate THttpServer" << std::endl;

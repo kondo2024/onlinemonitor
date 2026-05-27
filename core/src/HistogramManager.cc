@@ -14,7 +14,7 @@
 using json = nlohmann::json;
 
 HistogramManager::HistogramManager()
-  : fResetAllRequested(false), fFigSaveCanvas(nullptr)
+  : fResetAllRequested(false), fSaveFiguresRequested(false), fFigSaveCanvas(nullptr)
 {}
 
 HistogramManager::~HistogramManager(){}
@@ -154,14 +154,17 @@ void HistogramManager::SetStyle(){
   gStyle->SetTitleStyle(0);
   gStyle->SetStatColor(0);
   gStyle->SetStatStyle(0);
+  gStyle->SetStatW(0.5);
+  gStyle->SetStatH(0.3);
   gStyle->SetStatX(0.9);
   gStyle->SetStatY(0.9);
   gStyle->SetPalette(1,0);
   gStyle->SetOptLogz(1);
   gStyle->SetOptFit(1);
-  gStyle->SetOptStat(1111111);
+  //gStyle->SetOptStat(1111111);
+  gStyle->SetOptStat(1110010);
   gStyle->SetPadBorderMode(1);
-  gStyle->SetOptDate(1);
+  //gStyle->SetOptDate(1);
 
   gStyle->SetLabelFont(132,"XYZ");
   gStyle->SetTitleFont(132,"XYZ");
@@ -173,13 +176,14 @@ void HistogramManager::SetStyle(){
   gStyle->SetPaperSize(20,20);
 }
 
-void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThreshold) {
-  TVirtualPad *savePad = gPad;
+void HistogramManager::SaveFigures() {
 
-  if (currentEvents < (resetThreshold * 0.1)) {
-    std::cout << "AutoSave skipped: Insufficient statistics." << std::endl;
-    return;
-  }
+  if (!fSaveFiguresRequested) return;
+  
+  // thread lock
+  //R__LOCKGUARD(gROOTMutex);
+
+  TVirtualPad *savePad = gPad;
 
   const char* home = std::getenv("ONLINEMONITOR_HOME");
   TDatime dt;
@@ -194,11 +198,13 @@ void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThresho
   gROOT->SetBatch(kTRUE);
   if (!fFigSaveCanvas)
     fFigSaveCanvas = new TCanvas("cFigSave", "Batch Save", 1200, 900);
-  
+
+  fFigSaveCanvas->Clear();
   fFigSaveCanvas->Divide(cols, rows);
   int totalHists = fHistograms.size();
   int pageNum = 1;
 
+  
   for (int i = 0; i < totalHists; ++i) {
     int padIdx = (i % padsPerPage) + 1;
     fFigSaveCanvas->cd(padIdx);
@@ -206,16 +212,19 @@ void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThresho
     fHistograms[i]->Draw();
 
     if (padIdx == padsPerPage || i == totalHists - 1) {
-      //      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".png";
-      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".jpg";
+      std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".png";
+      //std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".jpg";
       fFigSaveCanvas->SaveAs(filename.c_str());
-          
-      fFigSaveCanvas->Clear();
-      fFigSaveCanvas->Divide(cols, rows);
+
+      std::string filename_pdf = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".pdf";
+      fFigSaveCanvas->SaveAs(filename_pdf.c_str());
+
       pageNum++;
     }
   }
 
+  fSaveFiguresRequested = false;
+  
   gROOT->SetBatch(kFALSE);
   if (savePad) savePad->cd();
   //std::cout << "[AutoSave] Completed: " << (pageNum - 1) << " pages saved." << std::endl;
@@ -223,11 +232,6 @@ void HistogramManager::SaveFigures(Long64_t currentEvents, Long64_t resetThresho
   gSystem->ProcessEvents();
 
 }    
-
-
-void HistogramManager::RequestResetAll() {
-  fResetAllRequested = true;
-}
 
 void HistogramManager::ResetAll() {
   //std::cout << "[HistogramManager] Resetting all histograms..." << std::endl;

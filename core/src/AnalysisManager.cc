@@ -155,9 +155,13 @@ int AnalysisManager::ProcessEvent() {
   if (fIsHttpMaster && fFigAutoSave){
     auto now = std::chrono::steady_clock::now();
     if (now - fLastFigSaveTime > std::chrono::minutes(fFigSaveIntervalMinutes)) {
-      HistogramManager::GetInstance()->SaveFigures(fEntries, fAutoResetEvents);
+      HistogramManager::GetInstance()->RequestSaveFigures();
       fLastFigSaveTime = now;
     }
+  }
+  
+  if (HistogramManager::GetInstance()->IsSaveFiguresRequested()){
+    HistogramManager::GetInstance()->SaveFigures();
   }
 
   // reset histograms

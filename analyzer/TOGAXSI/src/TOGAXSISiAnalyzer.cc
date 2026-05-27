@@ -21,8 +21,11 @@ bool TOGAXSISiAnalyzer::Init(){
 
   HistogramManager* hm = HistogramManager::GetInstance();
 
-  fhidstrip = hm->BookTH2("TOGAXSISi_idstrip","TOGAXSI Si ID stripID",
+  fhidstrip = hm->BookTH2("TOGAXSISi_idstrip","TOGAXSI Si ID stripID;ID;stripID",
 			  20,0.5,20.5,200,0,1200, "TOGAXSI");
+
+  fhidadc = hm->BookTH2("TOGAXSISi_idadc","TOGAXSI Si ID ADC-8192;ID;ADC-8192",
+			  20,0.5,20.5,100,0,2000, "TOGAXSI");
 
   fhvxy   = hm->BookTH2("TOGAXSI_vxy","TOGAXSI Vertex XY;X;Y",
 			200,-50,50, 200,-50,50, "TOGAXSI");
@@ -55,7 +58,9 @@ void TOGAXSISiAnalyzer::Fill() {
 
     for (int j=0;j<nhit;++j){
       Double_t stripid = si->GetStripID(j);
+      Double_t adc = si->GetADC(j) - 8192;
       fhidstrip->Fill(id,stripid);
+      fhidadc->Fill(id,adc);
     }
   }
 

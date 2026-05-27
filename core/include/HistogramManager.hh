@@ -35,9 +35,11 @@ public:
 
   void InitStats();
   void SetStyle();
-  void SaveFigures(Long64_t currentEvents, Long64_t resetThreshold);
+  void RequestSaveFigures(){fSaveFiguresRequested = true;}
+  bool IsSaveFiguresRequested() const { return fSaveFiguresRequested; }
+  void SaveFigures();
   
-  void RequestResetAll();
+  void RequestResetAll(){fResetAllRequested = true;}
   bool IsResetAllRequested() const { return fResetAllRequested; }
   void ClearResetAllRequest() { fResetAllRequested = false; }
   void ResetAll();
@@ -53,6 +55,7 @@ private:
   virtual ~HistogramManager();
 
   bool fResetAllRequested;
+  bool fSaveFiguresRequested;
   std::map<std::string, TH1*> fHistogramsMap;
   std::vector<TH1*> fHistograms;
   TCanvas* fFigSaveCanvas;

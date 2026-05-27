@@ -30,6 +30,7 @@ protected:
   Long64_t *fEntriesPtr = nullptr;
   
   TH1* fhidstrip;
+  TH1* fhidadc;
 
   TH1* fhvxy;
   TH1* fhvzx;

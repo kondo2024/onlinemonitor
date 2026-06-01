@@ -27,6 +27,9 @@ protected:
   TH1* fhidtd;
   TH1* fhidqu;
   TH1* fhidqd;
+  
+  TH1* fhid_gtu;  
+  TH1* fhid_gqu;  
 };
 
 #endif

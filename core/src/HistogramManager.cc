@@ -129,8 +129,8 @@ void HistogramManager::InitStats() {// dummy draw for reflecting gStyle settings
   if (!fFigSaveCanvas)
     fFigSaveCanvas = new TCanvas("cFigSave", "Batch Save", 1200, 900);
 
-  float rm = fFigSaveCanvas->GetRightMargin();
-  float tm = fFigSaveCanvas->GetTopMargin();
+//  float rm = fFigSaveCanvas->GetRightMargin();
+//  float tm = fFigSaveCanvas->GetTopMargin();
 //  gStyle->SetStatX(1.0-rm-0.03);
 //  gStyle->SetStatY(1.0-tm);
 //  gStyle->SetStatW(0.25);
@@ -209,9 +209,18 @@ void HistogramManager::SaveFigures() {
     int padIdx = (i % padsPerPage) + 1;
     fFigSaveCanvas->cd(padIdx);
 
+    TObject *oldstats = fHistograms[i]->GetListOfFunctions()->FindObject("stats");
+    if (oldstats){
+      fHistograms[i]->GetListOfFunctions()->Remove(oldstats);
+      delete oldstats;
+    }
+
+    
     fHistograms[i]->Draw();
 
     if (padIdx == padsPerPage || i == totalHists - 1) {
+      fFigSaveCanvas->Update();
+
       std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".png";
       //std::string filename = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".jpg";
       fFigSaveCanvas->SaveAs(filename.c_str());
@@ -219,6 +228,9 @@ void HistogramManager::SaveFigures() {
       std::string filename_pdf = (std::string)home + "/figs/onlinemonitor_" + timestamp + "_" + std::to_string(pageNum) + ".pdf";
       fFigSaveCanvas->SaveAs(filename_pdf.c_str());
 
+      fFigSaveCanvas->Clear();
+      fFigSaveCanvas->Divide(cols, rows);
+      
       pageNum++;
     }
   }
@@ -244,6 +256,16 @@ void HistogramManager::ResetAll() {
     h->Reset("ICES");
   }
   fResetAllRequested = false;
+}
+
+double HistogramManager::GetUserVariable(const std::string& name) {
+  auto it = fUserVarMap.find(name);
+  if (it != fUserVarMap.end()) {
+    return it->second;
+  }else{
+    std::cout << "[HistogramManager] No user variable: " <<name<< std::endl;
+  }
+  return -9999;
 }
 
 std::vector<std::string> HistogramManager::GetAllNames() {

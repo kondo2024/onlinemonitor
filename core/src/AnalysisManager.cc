@@ -129,6 +129,7 @@ int AnalysisManager::ProcessEvent() {
     for (auto analyzer : fAnalyzers) analyzer->ReconstructData();
     for (auto analyzer : fAnalyzers) analyzer->Fill();
     for (auto analyzer : fAnalyzers) analyzer->ClearData();
+    HistogramManager::GetInstance()->ClearUserVariables();
     fEventStore->ClearData();
     fEntries++;
   }

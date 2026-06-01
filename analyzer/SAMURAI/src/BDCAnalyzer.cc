@@ -262,6 +262,11 @@ void BDCAnalyzer::Fill() {
   fhtgt_zx->Fill(fZ_BDC2, BDC2_X);
   fhtgt_zx->Fill(fZ_TGT, TGTX);
 
+  HistogramManager::GetInstance()->SetUserVariable("TGTX",TGTX);
+  HistogramManager::GetInstance()->SetUserVariable("TGTY",TGTY);
+  HistogramManager::GetInstance()->SetUserVariable("TGTA",TGTA);
+  HistogramManager::GetInstance()->SetUserVariable("TGTB",TGTB);
+  
   //----------------------------------
   // beam focus check with pid by plastics
 

@@ -36,6 +36,10 @@ protected:
   TH1* fhvzx;
   TH1* fhvzy;
   TH1* fhentvy;
+
+  TH1* fhtgtxvx;
+  TH1* fhtgtyvy;
+  
 };
 
 #endif

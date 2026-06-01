@@ -101,7 +101,8 @@ curl "http://server:10101/SaveFigures/cmd.json"
 ```
 
 ## To do
-- classify histograms by TFolder
-- TOGAXSISiAnalyzer
+- classify histograms by TFolder?
+- clear fit line if histogram clear happens
+- histogram fit should happen when integral is larger than xxx
 - PPACAnalyzer
 

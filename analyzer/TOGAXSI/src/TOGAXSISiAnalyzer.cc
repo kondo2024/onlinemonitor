@@ -35,6 +35,12 @@ bool TOGAXSISiAnalyzer::Init(){
 			200,-200,200, 200,-50,50, "TOGAXSI");
   fhentvy = hm->BookTH2("TOGAXSI_entvy","TOGAXSI Entries VY;Entries;Y",
 			200,0,1.E+6, 200,-50,50, "TOGAXSI");
+
+  fhtgtxvx = hm->BookTH2("TOGAXSI_tgtxvx","TargetX TOGAXSI Vertex X;TargetX;TOGAXSI Vertex X",
+			  100,-20,20, 100,-20,20, "TOGAXSI");
+  fhtgtyvy = hm->BookTH2("TOGAXSI_tgtyvy","TargetY TOGAXSI Vertex Y;TargetY;TOGAXSI Vertex Y",
+			  100,-20,20, 100,-20,20, "TOGAXSI");
+  
   
   return true;
 }
@@ -48,8 +54,6 @@ void TOGAXSISiAnalyzer::Fill() {
 
   TClonesArray *array = fCalibTOGAXSISi->GetSiArray();
   int n = array->GetEntries();
-  int id_x = -9999;
-  int id_y = -9999;
 
   for (int i=0;i<n;++i){
     TArtTOGAXSISi *si = (TArtTOGAXSISi*)array->At(i);
@@ -64,6 +68,11 @@ void TOGAXSISiAnalyzer::Fill() {
     }
   }
 
+  // target positions by BDCs, calculated in BDCAnalyzer
+  HistogramManager* hm = HistogramManager::GetInstance();
+  double tgtx = hm->GetUserVariable("TGTX");
+  double tgty = hm->GetUserVariable("TGTY");
+  
   TClonesArray* vertex_array = (TClonesArray*)fRecoTOGAXSIVertex->GetTOGAXSIVertexArray();
   Int_t nv = vertex_array->GetEntries();
 //  std::cout<<"TOGAXSISI: nv="<<nv<<std::endl;
@@ -81,15 +90,17 @@ void TOGAXSISiAnalyzer::Fill() {
       fhvzx->Fill(pos.z(), pos.x());
       fhvzy->Fill(pos.z(), pos.y());
       if (fEntriesPtr) fhentvy->Fill(*fEntriesPtr,pos.y());
+      fhtgtxvx->Fill(tgtx,pos.x());
+      fhtgtyvy->Fill(tgty,pos.y());
     } else if (seg0>4 && seg1<5){// Cluster/Recoil
       fhvxy->Fill(pos.x(), pos.y());
       fhvzx->Fill(pos.z(), pos.x());
       fhvzy->Fill(pos.z(), pos.y());
       if (fEntriesPtr) fhentvy->Fill(*fEntriesPtr,pos.y());
+      fhtgtxvx->Fill(tgtx,pos.x());
+      fhtgtyvy->Fill(tgty,pos.y());
     }
   }
-
-  
 
 }
 //--------------------------------------------------------

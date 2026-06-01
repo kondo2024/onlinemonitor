@@ -26,6 +26,12 @@ bool HODAnalyzer::Init(){
   fhidqd = hm->BookTH2("HOD_idqd","HOD ID-QDraw;ID;QDraw",
 		       40,0.5,40.5,100,0,4000,"HOD");
 
+  fhid_gtu = hm->BookTH1("HOD_id_gtu","HOD ID 0<TUraw<2500;ID",
+			 40,0.5,40.5,"HOD");
+  fhid_gqu = hm->BookTH1("HOD_id_gqu","HOD ID QUraw>400;ID",
+			 40,0.5,40.5,"HOD");
+
+  
   return true;
 }
 //--------------------------------------------------------
@@ -48,6 +54,10 @@ void HODAnalyzer::Fill() {
     fhidtd->Fill(id,tdraw);
     fhidqu->Fill(id,quraw);
     fhidqd->Fill(id,qdraw);
+
+    if (0<turaw && turaw<2500) fhid_gtu->Fill(id);
+    if (quraw>400) fhid_gqu->Fill(id);
+    
   }
 }
 //--------------------------------------------------------

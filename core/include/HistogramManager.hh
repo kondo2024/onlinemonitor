@@ -44,6 +44,9 @@ public:
   void ClearResetAllRequest() { fResetAllRequested = false; }
   void ResetAll();
 
+  void SetUserVariable(const std::string& name, double val){fUserVarMap.insert(std::make_pair(name,val));}
+  double GetUserVariable(const std::string& name);
+  void ClearUserVariables(){ fUserVarMap.clear();}
 
   std::vector<std::string> GetAllNames();
   
@@ -59,6 +62,8 @@ private:
   std::map<std::string, TH1*> fHistogramsMap;
   std::vector<TH1*> fHistograms;
   TCanvas* fFigSaveCanvas;
+
+  std::map<std::string,double> fUserVarMap;
   
   void SetDirectory(TH1* h, const std::string& folder);
 };

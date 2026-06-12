@@ -28,13 +28,13 @@ bool TOGAXSISiAnalyzer::Init(){
 			  20,0.5,20.5,100,0,2000, "TOGAXSI");
 
   fhvxy   = hm->BookTH2("TOGAXSI_vxy","TOGAXSI Vertex XY;X;Y",
-			200,-50,50, 200,-50,50, "TOGAXSI");
+			100,-50,50, 100,-50,50, "TOGAXSI");
   fhvzx   = hm->BookTH2("TOGAXSI_vzx","TOGAXSI Vertex ZX;Z;X",
-			200,-200,200, 200,-50,50, "TOGAXSI");
+			100,-100,200, 100,-50,50, "TOGAXSI");
   fhvzy   = hm->BookTH2("TOGAXSI_vzy","TOGAXSI Vertex ZY;Z;Y",
-			200,-200,200, 200,-50,50, "TOGAXSI");
+			100,-100,200, 100,-50,50, "TOGAXSI");
   fhentvy = hm->BookTH2("TOGAXSI_entvy","TOGAXSI Entries VY;Entries;Y",
-			200,0,1.E+6, 200,-50,50, "TOGAXSI");
+			100,0,1.E+6, 100,-50,50, "TOGAXSI");
 
   fhtgtxvx = hm->BookTH2("TOGAXSI_tgtxvx","TargetX TOGAXSI Vertex X;TargetX;TOGAXSI Vertex X",
 			  100,-20,20, 100,-20,20, "TOGAXSI");

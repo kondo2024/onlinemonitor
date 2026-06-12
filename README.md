@@ -48,8 +48,6 @@ Load specific configuration json file (online, canvas mode).
 ```
 onlinemonitor online [config.json]
 ```
-(This may not work...)
-
 When you update the onlinemonitor and if it is not reflected on your display with browser, try Ctrl+F5.
 
 ### offline mode
@@ -64,12 +62,21 @@ Click Canvas, then keyboard control will be available.
 ### Core Settings
 | Key | Description |
 | :--- | :--- |
-| analyzers       | String list of analyzer class names to be instantiated|
+| analyzer       | Analyzer settings, see below|
+| display       | Display settings, see below|
+| fig       | Auto figure save settings, see below|
 | hist_range_file | Path to the JSON file defining histogram binning and ranges, should be located at the same dir as config.json|
 | skip_histograms | String list of histogram names to be excluded in the display|
 | http_port| TCP port number for the THttpServer (default: 10101)|
 | auto_reset       | If true, all histogram statistics will be cleared automatically when the event count reaches the threshold|
 | auto_reset_events| The threshold of event entries for the auto-reset|
+
+### Analyzer Settings
+| Key | Description |
+| :--- | :--- |
+| list       | String list of analyzer class names to be instantiated|
+| dc_tdc_file       | rootfile name containing TDC distributions for DCs|
+| z_bdc1 / z_bdc2 / z_target | Z positions of BDC1/BDC2/Target for tracking|
 
 ### Display Settings (display)
 | Key | Description |
@@ -79,6 +86,7 @@ Click Canvas, then keyboard control will be available.
 | canvas_width / canvas_height| Canvas dimensions for canvas mode |
 
 ### Figure Auto Save (fig)
+Auto save of figures is available. About 2GB disk space was used during s074/s055 campaign in 2026.
 | Key | Description |
 | :--- | :--- |
 | auto_save            | if true, figures(png) are automatically saved periodically in background |
@@ -87,7 +95,18 @@ Click Canvas, then keyboard control will be available.
 ## For developers
 
 #### User plots
-If you want to include a specific plot for you experiment, modify UserAnalyzer.hh/.cc.
+If you want to include a specific plot for you experiment, modify UserAnalyzer.hh/.cc. If you want to combine several detectors, use HistogramManager::fUserVarMap.
+
+Example of setting value (BDCAnalyzer.cc)
+```
+  HistogramManager::GetInstance()->SetUserVariable("TGTX",TGTX);	
+```
+
+Example of using value (TOGAXSIAnalyzer.cc)
+```
+  HistogramManager* hm = HistogramManager::GetInstance();
+  double tgtx = hm->GetUserVariable("TGTX");
+```
 
 #### communication by DAQ
 When a new run starts, call this. Then histograms are cleared.
@@ -99,6 +118,10 @@ To save the figures use this.
 ```
 curl "http://server:10101/SaveFigures/cmd.json"
 ```
+
+## Known issues
+- memory leak, browser spend a lot of memory in client
+- Too many ANAROOT messages prevents to read onlinemonitor messages
 
 ## To do
 - classify histograms by TFolder?

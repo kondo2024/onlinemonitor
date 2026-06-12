@@ -69,11 +69,11 @@ bool BDCAnalyzer::Init(){
 			 100,-3000,500, 100,-80,80,"BDC");
 
 
-  fhtof713q13 = hm->BookTH2("BPID_tof713q13","Beam PID TOF713 Q13;TOF713;Q13",
-			    100,0,2000, 100,0,4000,"BeamPID");
+  fhtof713q13 = hm->BookTH2("BPID_tof713q13","Beam PID TOF(F13-F7) Q13-2;TOF713;Q13",
+			    100,-380,-330, 100,0,2000,"BeamPID");
   
-  fhtof713q13_bpid = hm->BookTH2("BPID_tof713q13_bpid","Beam PID TOF713 Q13 gated;TOF713;Q13",
-				 100,0,2000, 100,0,4000,"BeamPID");
+  fhtof713q13_bpid = hm->BookTH2("BPID_tof713q13_bpid","Beam PID TOF(F13-F7) Q13-2 gated;TOF713;Q13",
+				 100,-380,-330, 100,0,2000,"BeamPID");
   
   fhtgt_xy_bpid = hm->BookTH2("TGT_xy_bpid","Target XY BeamPID;X(+:ZDS side);Y(+:up)",
 			      100,-80,80, 100,-80,80,"BDC");
@@ -308,7 +308,7 @@ void BDCAnalyzer::Fill() {
   Double_t q13 = -1;
 
   if (f7pla && f13pla1 && f13pla2){
-    tof713 = f7pla->GetTime() - 0.5*(f13pla1->GetTime() + f13pla2->GetTime());
+    tof713 = 0.5*(f13pla1->GetTime() + f13pla2->GetTime()) - f7pla->GetTime();
     q13 = f13pla2->GetQAveRaw();
   }
 

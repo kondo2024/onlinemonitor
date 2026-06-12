@@ -11,11 +11,10 @@
 	"pid_q13_high":1000
     },	  
     "hist_range_file": "hist_ranges.json",
-    "skip_histograms":[
-	"hTest1"
-    ],
+    "skip_histograms":[ "hTest1" ],
     "auto_reset": true,
     "auto_reset_events": 10000000,
+    "http_port": 10101,
     "display": {
 	"update_interval_ms": 8000,
 	"default_rows": 3,
@@ -26,6 +25,5 @@
     "fig": {
 	"auto_save": true,
 	"save_interval_minutes": 10
-    },
-    "http_port": 10101
+    }
 }

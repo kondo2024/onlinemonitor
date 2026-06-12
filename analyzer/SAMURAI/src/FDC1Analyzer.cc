@@ -33,7 +33,7 @@ bool FDC1Analyzer::Init(){
                             448,0.5,448.5,100,0,3000,"FDC1");
 
   fhfdc1_idtot = hm->BookTH2("FDC1_idtot","FDC1 ID-ToT;ID;ToT",
-                             448,0.5,448.5,100,0,1000,"FDC1");
+                             448,0.5,448.5,100,0,2000,"FDC1");
 
   fhfdc1_xy = hm->BookTH2("FDC1_xy","FDC1 XY;X;Y",
                           100,-250,250, 100,-250,250,"FDC1");

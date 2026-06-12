@@ -30,7 +30,7 @@ bool HttpOutput::Initialize() {
   const auto& config = cm->GetJson();
 
   // port
-  int port = config.value("http_port", 8080);
+  int port = config.value("http_port", 10101);
 
   // http root
   const char* home = std::getenv("ONLINEMONITOR_HOME");
